@@ -175,7 +175,7 @@
           console.log("changed tool to 'distance'");
           measurement._switchUnit("esriKilometers");
         }
-        console.log("Current scale is 1:", map.getScale());
+        // console.log("Current scale is 1:", map.getScale());
       });
 
       measurement.on("measure-end", function(evt) {
@@ -187,9 +187,6 @@
         if (evt.unitName.indexOf('ilometer') < 0) { // only supports km
           dom.byId("measureDiv").innerHTML =
             '<b>This sample only setup for comparing kilometers';
-          dom.byId("lengthDiv").innerHTML = '';
-          dom.byId("lengthDiv2").innerHTML = '';
-          dom.byId("distanceDiv").innerHTML = '';
           return;
         }
 
@@ -218,7 +215,7 @@
                 console.log("Distance:", distance, " km");
                 console.log("Distance Diff:", diff1, " km");
                 dom.byId("distanceDiv").innerHTML =
-                  "<i>Distance: </i> " + distance + " km<br>" +
+                  "<br><i>Distance: </i> " + distance + " km<br>" +
                   "<i>Difference between measurement widget and distance(): </i> " +
                   diff1 + " km";
               }
@@ -262,13 +259,12 @@
           }
         } else if (evt.toolName == "area") {
           dom.byId("distanceDiv").innerHTML =
-            "<i>Please measure distances instead of areas if you want to compare with GeometryService...</i> ";
+            "<br><i>Please measure distances instead of areas if you want to compare with GeometryService...</i> ";
           // Measurement result
-          console.log("Measurement length:" , evt);
+          console.log(evt.geometry);
           dom.byId("measureDiv").innerHTML =
             "<b>Measurement area:</b> " + evt.values + " " + evt.unitName;
         }
-
       });
 
     });
@@ -288,7 +284,6 @@
       <div style="position:absolute; right:20px; bottom:40px; z-Index:999;">
         <div id="notes" data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Geometry Service', closable:false, open:true">
           <div id="measureDiv"></div>
-          <br>
           <div id="distanceDiv"></div>
           <br>
           <div id="lengthDiv"></div>
