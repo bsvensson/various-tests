@@ -162,6 +162,14 @@
       // .UNIT_STATUTE_MILE; // 9093
       lenParams2.calculationType = "preserveShape"; // 
 
+      var areasAndLengthParams = new AreasAndLengthsParameters();
+      areasAndLengthParams.areaUnit = GeometryService.UNIT_SQUARE_KILOMETERS;
+      areasAndLengthParams.calculationType = "geodesic"; // preserveShape
+
+      var areasAndLengthParams2 = new AreasAndLengthsParameters();
+      areasAndLengthParams2.areaUnit = GeometryService.UNIT_SQUARE_KILOMETERS;
+      areasAndLengthParams2.calculationType = "preserveShape"; // geodesic
+
       measurement.on("measure", function(evt) {
         // console.log(evt.geometry);
       });
@@ -277,6 +285,50 @@
           // Measurement result
           dom.byId("measureDiv").innerHTML =
             "<b>Measurement area:</b> " + evt.values + " " + evt.unitName;
+          areasAndLengthParams.polygons = [evt.geometry];
+          geometryService.areasAndLengths(areasAndLengthParams,
+            function(measurements) {
+              var gs_result = measurements.areas[0];
+              console.log("geodesic area result: ", gs_result);
+              var diff1 = Math.abs(evt.values - gs_result);
+              if (diff1 == 0) {
+                dom.byId("resultsDiv1").innerHTML =
+                  "<br><i>geodesic areasAndLengths() exactly same as Measurement widget.</i>";
+              } else {
+                var percdiff = Math.abs(100 * diff1 / gs_result);
+                console.log("geodesic Area diff:", diff1,
+                  " sq km is a ", percdiff, " % difference");
+                dom.byId("resultsDiv1").innerHTML =
+                  "<br><i>geodesic areasAndLengths(): </i> " +
+                  gs_result + " sq km<br>" +
+                  "<i>Difference to measurement widget:</i> about " +
+                  diff1.toPrecision(2) + " sq km which is about a " +
+                  percdiff.toPrecision(2) + " % difference.";
+              }
+            }
+          );
+          areasAndLengthParams2.polygons = [evt.geometry];
+          geometryService.areasAndLengths(areasAndLengthParams2,
+            function(measurements) {
+              var gs_result = measurements.areas[0];
+              console.log("preserveShape area result: ", gs_result);
+              var diff1 = Math.abs(evt.values - gs_result);
+              if (diff1 == 0) {
+                dom.byId("resultsDiv2").innerHTML =
+                  "<i>preserveShape areasAndLengths() exactly same as Measurement widget.</i>";
+              } else {
+                var percdiff = 100 * diff1 / gs_result;
+                console.log("preserveShape Area Diff:", diff1,
+                  " sq km is a ", percdiff, " % difference");
+                dom.byId("resultsDiv2").innerHTML =
+                  "<br><i>preserveShape areasAndLengths(): </i> " +
+                  gs_result + " sq km<br>" +
+                  "<i>Difference to measurement widget:</i> about " +
+                  diff1.toPrecision(2) + " sq km which is about a " +
+                  percdiff.toPrecision(2) + " % difference.";
+              }
+            }
+          );
         }
       });
 
