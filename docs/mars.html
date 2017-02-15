@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+  <title>Mars - Measurement and ScaleBar</title>
+  <link rel="stylesheet" href="https://js.arcgis.com/3.20/esri/themes/calcite/dijit/calcite.css">
+  <link rel="stylesheet" href="https://js.arcgis.com/3.20/esri/themes/calcite/esri/esri.css">
+  <style>
+    html,
+    body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    
+    #map {
+      padding: 0;
+    }
+    
+    #titlePane {
+      width: 300px;
+    }
+  </style>
+
+  <script src="https://js.arcgis.com/3.20/"></script>
+  <script>
+    var map;
+
+    require([
+      "esri/config",
+      "esri/map",
+      "esri/SpatialReference",
+      "esri/layers/ArcGISTiledMapServiceLayer",
+      "esri/layers/FeatureLayer",
+      "esri/dijit/Measurement",
+      "esri/dijit/Scalebar",
+      "esri/geometry/Point",
+      "esri/geometry/Polyline",
+      "esri/tasks/GeometryService",
+      "esri/tasks/AreasAndLengthsParameters",
+      "esri/tasks/DistanceParameters",
+      "esri/tasks/LengthsParameters",
+      "esri/symbols/Font",
+      "esri/symbols/TextSymbol",
+      "esri/layers/LabelClass",
+      "esri/Color",
+      "dojo/dom",
+      "dojo/parser",
+      "dijit/layout/BorderContainer",
+      "dijit/layout/ContentPane",
+      "dijit/TitlePane",
+      "dojo/domReady!"
+    ], function(
+      esriConfig,
+      Map,
+      SpatialReference,
+      ArcGISTiledMapServiceLayer,
+      FeatureLayer,
+      Measurement,
+      Scalebar,
+      Point,
+      Polyline,
+      GeometryService,
+      AreasAndLengthsParameters,
+      DistanceParameters,
+      LengthsParameters,
+      Font,
+      TextSymbol,
+      LabelClass,
+      Color,
+      dom, parser
+    ) {
+      parser.parse();
+
+      //This service is for development and testing purposes only. We recommend that you create your own geometry service for use within your applications
+      esriConfig.defaults.geometryService = new GeometryService(
+        "https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer"
+      );
+
+      map = new Map("map", {
+        showLabels: true //very important that this must be set to true!   
+      });
+
+      var tiled = new ArcGISTiledMapServiceLayer(
+        "https://tiles.arcgis.com/tiles/nzS0F0zdNLvs7nc8/arcgis/rest/services/Mars_MOLA_elevation/MapServer"
+      );
+      // var tiled = new ArcGISTiledMapServiceLayer("https://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer");
+      map.addLayer(tiled);
+
+      // create the feature layer to render and label
+      var states = new FeatureLayer(
+        "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Mars_Nomenclature/FeatureServer/0"
+      );
+
+      var json = {
+        "labelExpressionInfo": {
+          "value": "{name}"
+        }
+      };
+
+      //add labels using LabelClass/setLabelingInfo
+      var labelClass1 = new LabelClass(json);
+      var labelClass2 = new LabelClass(json);
+      labelClass1.symbol = new TextSymbol({
+        font: new Font("10"),
+        haloColor: new Color("black"),
+        haloSize: 1,
+        color: new Color("white")
+      });
+      labelClass2.symbol = new TextSymbol({
+        font: new Font("13"),
+        haloColor: new Color("black"),
+        haloSize: 2,
+        color: new Color("white")
+      });
+      labelClass1.minScale = 65000000;
+      labelClass1.maxScale = 17000000;
+      labelClass2.minScale = 17000000;
+      states.setLabelingInfo([labelClass1, labelClass2]);
+      map.addLayer(states);
+
+      tiled.on("load", function(evt) {
+        // dijit.byId("titlePane").set("title", tiled.description.substr(0, 90));
+        console.log("service desc : " + tiled.description);
+        console.log(tiled.spatialReference.wkid);
+        console.log("service units: " + tiled.units);
+        map.setLevel(0); // zoom out
+      });
+
+      var scalebar = new Scalebar({
+        map: map,
+        // "dual" displays both miles and kilometers
+        // "english" is the default, which displays miles
+        // use "metric" for kilometers
+        scalebarUnit: "dual"
+      });
+
+      var measurement = new Measurement({
+        map: map
+      }, dom.byId("measurementDiv"));
+
+      map.on("load", function(evt) {
+        measurement.startup();
+        measurement.setTool("distance", true);
+        measurement._switchUnit("esriKilometers"); // esriMile
+      });
+
+      var geometryService = new GeometryService(
+        "https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer"
+      );
+      // geometryService.on("areas-and-lengths-complete", outputAreaAndLength);
+      var distParams = new DistanceParameters();
+      distParams.distanceUnit = GeometryService.UNIT_KILOMETER; // : 9036, 
+      distParams.geodesic = true;
+      var lenParams = new LengthsParameters();
+      lenParams.lengthUnit = GeometryService.UNIT_KILOMETER; // : 9036, 
+      lenParams.calculationType = "geodesic"; // 
+      var lenParams2 = new LengthsParameters();
+      lenParams2.lengthUnit = GeometryService.UNIT_KILOMETER; // : 9036, 
+      // .UNIT_STATUTE_MILE; // 9093
+      lenParams2.calculationType = "preserveShape"; // 
+
+      measurement.on("measure", function(evt) {
+        // console.log(evt.geometry);
+      });
+
+      measurement.on("tool-change", function(evt) {
+        if (evt.toolName.indexOf('area') > -1) {
+          console.log("changed tool to 'area'");
+          measurement._switchUnit("esriSquareKilometers");
+        }
+        else if (evt.toolName.indexOf('distance') > -1) {
+          console.log("changed tool to 'distance'");
+          measurement._switchUnit("esriKilometers");
+        }
+        console.log("Current scale is 1:", map.getScale());
+      });
+
+      measurement.on("measure-end", function(evt) {
+        dom.byId("measureDiv").innerHTML = '';
+        dom.byId("lengthDiv").innerHTML = '';
+        dom.byId("lengthDiv2").innerHTML = '';
+        dom.byId("distanceDiv").innerHTML = '';
+
+        if (evt.unitName.indexOf('ilometer') < 0) { // only supports km
+          dom.byId("measureDiv").innerHTML =
+            '<b>This sample only setup for comparing kilometers';
+          dom.byId("lengthDiv").innerHTML = '';
+          dom.byId("lengthDiv2").innerHTML = '';
+          dom.byId("distanceDiv").innerHTML = '';
+          return;
+        }
+
+        if (evt.toolName == "distance") {
+          // Measurement result
+          console.log("Measurement length:" + evt.values + " " + evt.unitName);
+          dom.byId("measureDiv").innerHTML =
+            "<b>Measurement length:</b> " + evt.values + " " + evt.unitName;
+
+          // GeometryService
+          if (evt.geometry.paths[0].length == 2) {
+            distParams.geometry1 = new Point(evt.geometry.paths[0][0][0],
+              evt.geometry.paths[0][0][1], new SpatialReference({
+                wkid: tiled.spatialReference.wkid
+              }));
+            distParams.geometry2 = new Point(evt.geometry.paths[0][1][0],
+              evt.geometry.paths[0][1][1], new SpatialReference({
+                wkid: tiled.spatialReference.wkid
+              }));
+            geometryService.distance(distParams, function(distance) {
+              var diff1 = evt.values - distance;
+              if (diff1 == 0) {
+                dom.byId("distanceDiv").innerHTML =
+                  "<i>distance() exactly same as Measurement widget.</i>";
+              } else {
+                console.log("Distance:", distance, " km");
+                console.log("Distance Diff:", diff1, " km");
+                dom.byId("distanceDiv").innerHTML =
+                  "<i>Distance: </i> " + distance + " km<br>" +
+                  "<i>Difference between measurement widget and distance(): </i> " +
+                  diff1 + " km";
+              }
+            });
+          }
+          if (evt.geometry.paths[0].length > 1) {
+            lenParams.polylines = [evt.geometry]; // polylines
+            lenParams2.polylines = [evt.geometry]; // polylines
+            geometryService.lengths(lenParams, function(length) {
+              var diff1 = evt.values - length.lengths[0];
+              if (diff1 == 0) {
+                dom.byId("lengthDiv").innerHTML =
+                  "<i>geodesic length() exactly same as Measurement widget.</i>";
+              } else {
+                console.log("Geodesic length:", length.lengths[0],
+                  " km");
+                console.log("Diff:", diff1, " km");
+                dom.byId("lengthDiv").innerHTML =
+                  "<i>Geodesic length: </i> " + length.lengths[0] +
+                  " km<br>" +
+                  "<i>Difference between measurement widget and geodesic length(): </i> " +
+                  diff1 + " km";
+              }
+            });
+            geometryService.lengths(lenParams2, function(length) {
+              var diff1 = evt.values - length.lengths[0];
+              if (diff1 == 0) {
+                dom.byId("lengthDiv").innerHTML =
+                  "<i>PreserveShape length() exactly same as Measurement widget.</i>";
+              } else {
+                console.log("PreserveShape length:", length.lengths[
+                  0], " km");
+                console.log("Diff:", diff1, " km");
+                dom.byId("lengthDiv2").innerHTML =
+                  "<i>PreserveShape length: </i> " + length.lengths[
+                    0] + " km<br>" +
+                  "<i>Difference between measurement widget and preserveshape length(): </i> " +
+                  diff1 + " km";
+              }
+            });
+          }
+        } else if (evt.toolName == "area") {
+          dom.byId("distanceDiv").innerHTML =
+            "<i>Please measure distances instead of areas if you want to compare with GeometryService...</i> ";
+          // Measurement result
+          console.log("Measurement length:" , evt);
+          dom.byId("measureDiv").innerHTML =
+            "<b>Measurement area:</b> " + evt.values + " " + evt.unitName;
+        }
+
+      });
+
+    });
+  </script>
+</head>
+
+<body class="calcite">
+  <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline', gutters:false"
+    style="width: 100%; height: 100%; margin: 0;">
+
+    <div id="map" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'">
+      <div style="position:absolute; right:20px; top:10px; z-Index:999;">
+        <div id="titlePane" data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Mars Measurements', closable:false, open:true">
+          <div id="measurementDiv"></div>
+        </div>
+      </div>
+      <div style="position:absolute; right:20px; bottom:40px; z-Index:999;">
+        <div id="notes" data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Geometry Service', closable:false, open:true">
+          <div id="measureDiv"></div>
+          <br>
+          <div id="distanceDiv"></div>
+          <br>
+          <div id="lengthDiv"></div>
+          <br>
+          <div id="lengthDiv2"></div>
+          <br>
+          <p>If measuring two points, both distance() and lengths() of GeometryService
+            will be used. If more than two points, only lengths().</p>
+        </div>
+      </div>
+    </div>
+    </div>
+</body>
+</html>
