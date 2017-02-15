@@ -170,23 +170,34 @@
         if (evt.toolName.indexOf('area') > -1) {
           console.log("changed tool to 'area'");
           measurement._switchUnit("esriSquareKilometers");
+          dom.byId("measureDiv").innerHTML = '';
+          dom.byId("resultsDiv1").innerHTML = '';
+          dom.byId("resultsDiv2").innerHTML = '';
+          dom.byId("resultsDiv3").innerHTML = '';
+          dom.byId("footnote").innerHTML = '';
         }
         else if (evt.toolName.indexOf('distance') > -1) {
           console.log("changed tool to 'distance'");
           measurement._switchUnit("esriKilometers");
+          dom.byId("measureDiv").innerHTML = '';
+          dom.byId("resultsDiv1").innerHTML = '';
+          dom.byId("resultsDiv2").innerHTML = '';
+          dom.byId("resultsDiv3").innerHTML = '';
+          dom.byId("footnote").innerHTML =
+            '<br>If measuring two points, both distance() and lengths() of GeometryService will be used. If more than two points, only lengths().';
         }
         // console.log("Current scale is 1:", map.getScale());
       });
 
       measurement.on("measure-end", function(evt) {
         dom.byId("measureDiv").innerHTML = '';
-        dom.byId("lengthDiv").innerHTML = '';
-        dom.byId("lengthDiv2").innerHTML = '';
-        dom.byId("distanceDiv").innerHTML = '';
+        dom.byId("resultsDiv1").innerHTML = '';
+        dom.byId("resultsDiv2").innerHTML = '';
+        dom.byId("resultsDiv3").innerHTML = '';
 
         if (evt.unitName.indexOf('ilometer') < 0) { // only supports km
           dom.byId("measureDiv").innerHTML =
-            '<b>This sample only setup for comparing kilometers';
+            '<b>This sample is only setup for comparing kilometers';
           return;
         }
 
@@ -207,15 +218,17 @@
                 wkid: tiled.spatialReference.wkid
               }));
             geometryService.distance(distParams, function(distance) {
-              var diff1 = evt.values - distance;
+              var gs_result = distance;
+              var diff1 = Math.abs(evt.values - gs_result);
               if (diff1 == 0) {
-                dom.byId("distanceDiv").innerHTML =
+                dom.byId("resultsDiv1").innerHTML =
                   "<i>distance() exactly same as Measurement widget.</i>";
               } else {
-                console.log("Distance:", distance, " km");
+                var percdiff = Math.abs(100 * diff1 / gs_result);
+                console.log("Distance:", gs_result, " km");
                 console.log("Distance Diff:", diff1, " km");
-                dom.byId("distanceDiv").innerHTML =
-                  "<br><i>Distance: </i> " + distance + " km<br>" +
+                dom.byId("resultsDiv1").innerHTML =
+                  "<br><i>Distance: </i> " + gs_result + " km<br>" +
                   "<i>Difference between measurement widget and distance(): </i> " +
                   diff1 + " km";
               }
@@ -225,43 +238,43 @@
             lenParams.polylines = [evt.geometry]; // polylines
             lenParams2.polylines = [evt.geometry]; // polylines
             geometryService.lengths(lenParams, function(length) {
-              var diff1 = evt.values - length.lengths[0];
+              var gs_result = length.lengths[0];
+              var diff1 = Math.abs(evt.values - gs_result);
               if (diff1 == 0) {
-                dom.byId("lengthDiv").innerHTML =
-                  "<i>geodesic length() exactly same as Measurement widget.</i>";
+                dom.byId("resultsDiv2").innerHTML =
+                  "<br><i>geodesic length() exactly same as Measurement widget.</i>";
               } else {
-                console.log("Geodesic length:", length.lengths[0],
-                  " km");
-                console.log("Diff:", diff1, " km");
-                dom.byId("lengthDiv").innerHTML =
-                  "<i>Geodesic length: </i> " + length.lengths[0] +
+                var percdiff = Math.abs(100 * diff1 / gs_result);
+                console.log("Geodesic length:", gs_result, " km");
+                console.log("Geodesic Diff:", diff1, " km");
+                dom.byId("resultsDiv2").innerHTML =
+                  "<br><i>Geodesic length: </i> " + gs_result +
                   " km<br>" +
                   "<i>Difference between measurement widget and geodesic length(): </i> " +
                   diff1 + " km";
               }
             });
             geometryService.lengths(lenParams2, function(length) {
-              var diff1 = evt.values - length.lengths[0];
+              var gs_result = length.lengths[0];
+              var diff1 = Math.abs(evt.values - gs_result);
               if (diff1 == 0) {
-                dom.byId("lengthDiv").innerHTML =
-                  "<i>PreserveShape length() exactly same as Measurement widget.</i>";
+                dom.byId("resultsDiv3").innerHTML =
+                  "<br><i>PreserveShape length() exactly same as Measurement widget.</i>";
               } else {
-                console.log("PreserveShape length:", length.lengths[
-                  0], " km");
-                console.log("Diff:", diff1, " km");
-                dom.byId("lengthDiv2").innerHTML =
-                  "<i>PreserveShape length: </i> " + length.lengths[
-                    0] + " km<br>" +
+                var percdiff = Math.abs(100 * diff1 / gs_result);
+                console.log("PreserveShape length:", gs_result,
+                  " km");
+                console.log("PreserveShape Diff:", diff1, " km");
+                dom.byId("resultsDiv3").innerHTML =
+                  "<br><i>PreserveShape length: </i> " + gs_result +
+                  " km<br>" +
                   "<i>Difference between measurement widget and preserveshape length(): </i> " +
                   diff1 + " km";
               }
             });
           }
         } else if (evt.toolName == "area") {
-          dom.byId("distanceDiv").innerHTML =
-            "<br><i>Please measure distances instead of areas if you want to compare with GeometryService...</i> ";
           // Measurement result
-          console.log(evt.geometry);
           dom.byId("measureDiv").innerHTML =
             "<b>Measurement area:</b> " + evt.values + " " + evt.unitName;
         }
@@ -284,14 +297,10 @@
       <div style="position:absolute; right:20px; bottom:40px; z-Index:999;">
         <div id="notes" data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Geometry Service', closable:false, open:true">
           <div id="measureDiv"></div>
-          <div id="distanceDiv"></div>
-          <br>
-          <div id="lengthDiv"></div>
-          <br>
-          <div id="lengthDiv2"></div>
-          <br>
-          <p>If measuring two points, both distance() and lengths() of GeometryService
-            will be used. If more than two points, only lengths().</p>
+          <div id="resultsDiv1"></div>
+          <div id="resultsDiv2"></div>
+          <div id="resultsDiv3"></div>
+          <div id="footnote" style="color:grey"></div>
         </div>
       </div>
     </div>
