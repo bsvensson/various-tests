@@ -69,7 +69,7 @@
     <Polygon>
       <outerBoundaryIs>
         <LinearRing>
-          <coordinates>-100,41,0 -103,41,0 -103,44,0 -100,45,0 -100,41,0</coordinates>
+          <coordinates>-99,41,0 -103,41,0 -103,44,0 -99,45,0 -99,41,0</coordinates>
         </LinearRing>
       </outerBoundaryIs>
     </Polygon>
@@ -80,29 +80,30 @@
     <Polygon>
       <outerBoundaryIs>
         <LinearRing>
-          <coordinates>-99,41,0 -92,41,0 -92,44,0 -99,45,0 -99,41,0</coordinates>
+          <coordinates>-98,41,0 -94,41,0 -94,44,0 -98,45,0 -98,41,0</coordinates>
         </LinearRing>
       </outerBoundaryIs>
     </Polygon>
   </Placemark>
   <Placemark>
-    <name>Area 3</name>
+    <name>Area 3 
+      outline 0</name>
     <styleUrl>#test3</styleUrl>
     <Polygon>
       <outerBoundaryIs>
         <LinearRing>
-          <coordinates>-85,41,0 -91,41,0 -91,44,0 -85,45,0 -85,41,0</coordinates>
+          <coordinates>-89,41,0 -93,41,0 -93,44,0 -89,45,0 -89,41,0</coordinates>
         </LinearRing>
       </outerBoundaryIs>
     </Polygon>
   </Placemark>
   <Placemark>
-    <name>Area 4</name>
+    <name>Area 4 - outline false</name>
     <styleUrl>#test4</styleUrl>
     <Polygon>
       <outerBoundaryIs>
         <LinearRing>
-          <coordinates>-84,41,0 -78,41,0 -78,44,0 -84,45,0 -84,41,0</coordinates>
+          <coordinates>-84,41,0 -88,41,0 -88,44,0 -84,45,0 -84,41,0</coordinates>
         </LinearRing>
       </outerBoundaryIs>
     </Polygon>
