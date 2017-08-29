@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:kml="http://www.opengis.net/kml/2.2">
+<Document>
+  <name>WY.kml</name>
+  <StyleMap id="msn_ylw-pushpin">
+    <Pair>
+      <key>normal</key>
+      <styleUrl>#sn_ylw-pushpin</styleUrl>
+    </Pair>
+    <Pair>
+      <key>highlight</key>
+      <styleUrl>#sh_ylw-pushpin</styleUrl>
+    </Pair>
+  </StyleMap>
+  <Style id="sn_ylw-pushpin">
+    <LineStyle>
+      <color>ff1378fa</color>
+    </LineStyle>
+    <PolyStyle>
+      <color>590e87ff</color>
+    </PolyStyle>
+  </Style>
+  <Style id="sh_ylw-pushpin">
+    <LineStyle>
+      <color>ff1378fa</color>
+    </LineStyle>
+    <PolyStyle>
+      <color>590e87ff</color>
+    </PolyStyle>
+  </Style>
+  <Style id="test1-nolinestyle">
+    <PolyStyle>
+      <color>ff0000ff</color>
+    </PolyStyle>
+  </Style>
+  <Style id="test2">
+    <PolyStyle>
+      <color>ff0000ff</color>
+      <outline>ff0000ff</outline>
+    </PolyStyle>
+  </Style>
+  <Style id="test3">
+    <PolyStyle>
+      <color>ff0000ff</color>
+      <outline>0</outline>
+    </PolyStyle>
+  </Style>
+  <Style id="test4">
+    <PolyStyle>
+      <color>ff0000ff</color>
+      <outline>false</outline>
+    </PolyStyle>
+  </Style>
+  <Placemark>
+    <name>Wyoming(WY)</name>
+    <styleUrl>#msn_ylw-pushpin</styleUrl>
+    <Polygon>
+      <outerBoundaryIs>
+        <LinearRing>
+          <coordinates>-111,41,0 -104,41,0 -104,44,0 -111,45,0 -111,41,0 
+          </coordinates>
+        </LinearRing>
+      </outerBoundaryIs>
+    </Polygon>
+  </Placemark>
+  <Placemark>
+    <name>Area 2</name>
+    <styleUrl>#test1</styleUrl>
+    <Polygon>
+      <outerBoundaryIs>
+        <LinearRing>
+          <coordinates>-100,41,0 -103,41,0 -103,44,0 -100,45,0 -100,41,0</coordinates>
+        </LinearRing>
+      </outerBoundaryIs>
+    </Polygon>
+  </Placemark>
+</Document>
+</kml>
