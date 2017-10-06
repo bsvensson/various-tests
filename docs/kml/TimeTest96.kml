@@ -2,74 +2,27 @@
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
     <name>TIME TEST 96</name>
-    <Style id="icon-503-DB4436-normal">
-      <IconStyle>
-        <color>ff3644db</color>
-        <scale>1.1</scale>
-        <Icon>
-          <href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
-        </Icon>
-        <hotSpot x="16" xunits="pixels" y="32" yunits="insetPixels"/>
-      </IconStyle>
-      <LabelStyle>
-        <scale>0</scale>
-      </LabelStyle>
-    </Style>
-    <Style id="icon-503-DB4436-highlight">
-      <IconStyle>
-        <color>ff3644db</color>
-        <scale>1.1</scale>
-        <Icon>
-          <href>http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
-        </Icon>
-        <hotSpot x="16" xunits="pixels" y="32" yunits="insetPixels"/>
-      </IconStyle>
-      <LabelStyle>
-        <scale>1.1</scale>
-      </LabelStyle>
-    </Style>
-    <StyleMap id="icon-503-DB4436">
-      <Pair>
-        <key>normal</key>
-        <styleUrl>#icon-503-DB4436-normal</styleUrl>
-      </Pair>
-      <Pair>
-        <key>highlight</key>
-        <styleUrl>#icon-503-DB4436-highlight</styleUrl>
-      </Pair>
-    </StyleMap>
-    <Placemark>
+    <Placemark id="y96">
       <name>Placemark Test 96</name>
       <description>Whoooo 1996!</description>
-      <styleUrl>#icon-503-DB4436</styleUrl>
       <Point><coordinates>-96,45.890007,0</coordinates></Point>
       <TimeStamp><when>1996</when></TimeStamp>      
     </Placemark>
-    <Placemark>
+    <Placemark id="y97">
       <name>Placemark Test 97</name>
       <description>Whoooo 1997!</description>
-      <styleUrl>#icon-503-DB4436</styleUrl>
       <Point><coordinates>-97,45.890007,0</coordinates></Point>
       <TimeStamp><when>1997</when></TimeStamp>      
     </Placemark>
-    <Placemark>
+    <Placemark id="y98">
       <name>Placemark Test 98</name>
       <description>Whoooo 1998!</description>
-      <styleUrl>#icon-503-DB4436</styleUrl>
       <Point><coordinates>-98,45.890007,0</coordinates></Point>
       <TimeStamp><when>1998</when></TimeStamp>      
     </Placemark>
-    <Placemark>
-      <name>Placemark Test 98</name>
-      <description>Whoooo 1998!</description>
-      <styleUrl>#icon-503-DB4436</styleUrl>
-      <Point><coordinates>-98,45.890007,0</coordinates></Point>
-      <TimeStamp><when>1998</when></TimeStamp>      
-    </Placemark>
-    <Placemark>
+    <Placemark id="y99">
       <name>Placemark Test 99</name>
       <description>Whoooo 1999!</description>
-      <styleUrl>#icon-503-DB4436</styleUrl>
       <Point><coordinates>-99,45.890007,0</coordinates></Point>
       <TimeStamp><when>1999</when></TimeStamp>      
     </Placemark>
