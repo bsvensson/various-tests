@@ -1,21 +1,6 @@
 <kml xmlns="http://earth.google.com/kml/2.0">
 <Folder>
-  <name>SPC Active Watches</name>
-  <open>1</open>
-  <description>
-  <![CDATA[One description
-  ]]>
-  </description>
   <NetworkLink>
-    <open>1</open>
-    <name>One NetworkLink</name>
-    <visibility>1</visibility>
-    <refreshVisibility>1</refreshVisibility>
-    <description>
-    <![CDATA[
-    Another description
-    ]]>
-    </description>
     <Link>
     <href>http://www.spc.noaa.gov/products/watch/WW0552_SAW.kmz</href>
     </Link>
