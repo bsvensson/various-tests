@@ -1,0 +1,29 @@
+<kml xmlns="http://earth.google.com/kml/2.0">
+<Folder>
+  <name>SPC Active Watches</name>
+  <open>1</open>
+  <description>
+  <![CDATA[
+  SPC Active Watches as of Mon Aug  5 12:35:01 UTC 2019
+  Visit http://www.spc.noaa.gov/products/watch/ for more info.
+  ]]>
+  </description>
+  <NetworkLink>
+    <open>1</open>
+    <name>Severe Thunderstorm Watch 552 Active Till 20190805/2000UTC</name>
+    <visibility>1</visibility>
+    <refreshVisibility>1</refreshVisibility>
+    <description>
+    <![CDATA[
+    Severe Thunderstorm Watch 552 Active Till 20190805/2000 UTC.<br />
+    Visit http://www.spc.noaa.gov/products/watch/ww0552.html for more info.
+    ]]>
+    </description>
+    <Link>
+    <href>http://www.spc.noaa.gov/products/watch/WW0552_SAW.kmz</href>
+    <refreshMode>onInterval</refreshMode>
+    <refreshInterval>60</refreshInterval>
+    </Link>
+  </NetworkLink>
+</Folder>
+</kml>
