@@ -18,8 +18,6 @@
     </description>
     <Link>
     <href>http://www.spc.noaa.gov/products/watch/WW0552_SAW.kmz</href>
-    <refreshMode>onInterval</refreshMode>
-    <refreshInterval>60</refreshInterval>
     </Link>
   </NetworkLink>
 </Folder>
