@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Comparing webmaps in 3x and 4x JSAPI</title>
+  <link
+    rel="stylesheet"
+    href="https://js.arcgis.com/4.16/esri/themes/light/main.css"
+  />
+  
+</head>
+<body class="esri-widget">
+
+  <h1>Comparing webmaps in 3x and 4x JSAPI</h1>
+
+  <p>
+    <a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=901ab4abfc884c408fc6057f2dc53fbc">https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=901ab4abfc884c408fc6057f2dc53fbc</a>
+    - Plug in your own (production) webmap ID!<br>
+    <ul>
+      <li>To test with devext (or other portal), add <code>portal</code> param, e.g., <a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=c03c8685721b4b7a99f0968765277530&portal=https://devext.arcgis.com/">https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=c03c8685721b4b7a99f0968765277530&portal=https://devext.arcgis.com/</a></li>
+      <li>To not sync the maps, add <code>sync=false</code>, e.g., <a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=4f0e3f5bed3744788ebc028965a8a24a&portal=qaext&sync=false">https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=4f0e3f5bed3744788ebc028965a8a24a&portal=qaext&sync=false</a>.</li>
+    </ul>
+  </p>
+
+  <h2>Known differences</h2>
+
+  <ul><b>Better with 4x</b>
+    <li>Better performance</li>
+    <li><a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=901ab4abfc884c408fc6057f2dc53fbc">multi-line labels</a></li>
+    <li><a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=901ab4abfc884c408fc6057f2dc53fbc">line labels that curves</a></li>
+    <li><a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=8a7e20265f48436ebbc4e8e68af1aaa6">date labels formatted as dates</a></li>
+    <li><a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=b45fda59687f4d0b8bef7c98dd183093">Labels and Proportional Symbols don't align for multi-part polygons</a>. 3x wontfix: <a href="https://devtopia.esri.com/WebGIS/arcgis-js-api/issues/5080">#5080</a></li>
+    <li><a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=81994ce9140d4219935bd1eb65441add&portal=https://devext.arcgis.com/6">non-black hatch patterns</a> (same as Pro)</li>
+    <li><a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=44bdecc5abae43fdb2fbef6919cacf2e">better attribution</a>: less unnecessary duplication, attribution for operational layers</li>    
+    <li>for WMTS, 4x will automatically try KVP if RESTful fails.  3x does not. You have to set the serviceMode - which webmap does automatically, but not the layer</li>
+  </ul>
+
+  <ul><b>Needed in 4x for full webmap support (aka 3x compatibiliy)</b>
+    <li>support for <a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=b8073d4f8a7742e1884e7200603b9cb3">temporal renderer</a> - API issue <a href="https://devtopia.esri.com/WebGIS/arcgis-js-api/issues/7351">#7351</a>.</li>
+    <li>support for <a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=d3db80772d5d497aa4e12f8ea4df4d99&portal=https://devext.arcgis.com/">trackRenderer</a> - API issue <a href="https://devtopia.esri.com/WebGIS/arcgis-js-api/issues/9958">#9958</a>.</li>
+    <li>support for <a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=c785450f21fa471c95d07aec9f9ec044">WFS</a> - Planning issue <a href="https://devtopia.esri.com/WebGIS/arcgis-js-api-planning-docs/issues/12">#12</a>.</li>  
+  </ul>
+
+  <ul><b>Still better in 3x - maybe needed for almost full webmap support</b>
+    <li>polygon label placement for weird shapes - API issue <a href="https://devtopia.esri.com/WebGIS/arcgis-js-api/issues/17476">#17476</a>.</li>
+    <li><a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=34a1420d53ee459aa351dd9504bebac2">better ordering of overlapping symbols of different sizes</a></li>
+    <li><a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=a5ef00a7ebd3479d824d958caa78f919&portal=https://devext.arcgis.com/">showing non-CORS symbols without imagedata</a></li>
+    <li><a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=37433da40ba340fe97e46029de62541d">some other CORS issue</a></li>
+</ul>
+
+  <ul><b>3x - no plans to fix</b>
+    <li>popup can be maximized to fully view <a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=ae85ca023eae49bfb9fa1c99df8cd7c0">tables within a popup</a></li>
+    <li><a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=596b6caca4a540ac99207dc6ff72d6d0">fake italic labels for fonts without italic support</a>, e.g. "Arial Unicode MS" - API issue <a href="https://devtopia.esri.com/WebGIS/arcgis-js-api/issues/20155">#20155</a> (Pro supports italic if installed on client machine, <a href="https://devtopia.esri.com/WebGIS/webmap-spec/issues/701">not otherwise</a>).</li>
+    <li><a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=2f12323c91a04593914558eb48f4aed5">loading old (pre-2.0) webmap versions</a></li>
+  </ul>
+
+  <ul><b>3x - fixed in which 4x version?</b>
+    <li>Fixed in 4.14: <s>support for clustering</s> <a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=45a634985da54dbb871c86afdf39a207">clustering</a>.</li>  
+    <li>Fixed in 4.12: <s>support for timeslider</s></li>
+    <li>Fixed in 4.15: <s>support for <a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=0c5c6b3d54df496a8221f0138b295707">animated markers</a></s> - <a href="https://devtopia.esri.com/WebGIS/arcgis-js-api/issues/17999">#17999</a>.</li>
+    <li>Fixed in 4.16: arrow support on lines.</li>
+  </ul>
+
+  <ul><b>Just different...</b>
+    <li><a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=302b2e63fb2042989c33b17108942ca0">halo on label is skinnier in 4x</a></li>
+    <li><a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/daily.html?webmap=6ad60362d68945cca4736a16c6823de4">heatmap looks a little bit different</a> but 4x has better legend :)</li>
+  </ul>
+
+  <hr>
+  
+  <h2>Other test apps</h2>
+  <ul>
+    <li><a href="https://devext.arcgis.com/apps/mapviewer/index.html?webmap=c03c8685721b4b7a99f0968765277530">next generation map viewer on devext</a></li>
+    <li><a href="https://www.arcgis.com/apps/Media/index.html?webmap=901ab4abfc884c408fc6057f2dc53fbc&legendlayers=true&basemap_gallery=true&theme=dark">Embed Template</a> is pretty vanilla 3x.</li>
+    <li><a href="https://www.arcgis.com/apps/Media/index.html?webmap=901ab4abfc884c408fc6057f2dc53fbc">Media Template</a> is pretty vanilla 4x.</li>
+    <li><a href="basic3x.html?webmap=a5b3d1196239447a880f3e47e5ed467a">very basic 3x test app</a>.</li>
+    <li><a href="basic4x.html?webmap=a5b3d1196239447a880f3e47e5ed467a">very basic 4x test app</a>.</li>
+    <li>For the 6.4 release (aka 3.27/4.10), replace "daily" in the above URLs with <a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/64was327and410.html?webmap=45a634985da54dbb871c86afdf39a207">64was327and410.html</a></li>
+    <li>For the 7.1 release (aka 3.28/4.11), replace "daily" in the above URLs with <a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/71was328and411.html?webmap=45a634985da54dbb871c86afdf39a207">71was328and411.html</a></li>
+    <li>For the 7.2 release (aka 3.29/4.12), replace "daily" in the above URLs with <a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/72was329and412.html?webmap=45a634985da54dbb871c86afdf39a207">72was329and412.html</a></li>
+    <li>For the 7.3 release (aka 3.30/4.13), replace "daily" in the above URLs with <a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/73was330and413.html?webmap=45a634985da54dbb871c86afdf39a207">73was330and413.html</a></li>
+    <li>For the 7.4 release (aka 3.31/4.14), replace "daily" in the above URLs with <a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/74was331and414.html?webmap=45a634985da54dbb871c86afdf39a207">74was331and414.html</a></li>
+    <li>For the 8.1 release (aka 3.32/4.15), replace "daily" in the above URLs with <a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/81was332and415.html?webmap=45a634985da54dbb871c86afdf39a207">81was332and415.html</a></li>
+    <li>For the 8.2 release (aka 3.33/4.16), replace "daily" in the above URLs with <a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/82was333and416.html?webmap=45a634985da54dbb871c86afdf39a207">82was333and416.html</a></li>
+    <li>For the 8.3 release (aka 3.34/4.17), replace "daily" in the above URLs with <a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/83was334and417.html?webmap=45a634985da54dbb871c86afdf39a207">83was334and417.html</a></li>
+    <li>For the 8.4 release (aka 3.35/4.18), replace "daily" in the above URLs with <a href="https://jscore.esri.com/testing/compare-3x-4x-webmaps/84was335and418.html?webmap=45a634985da54dbb871c86afdf39a207">84was335and418.html</a></li>
+  </ul>  
+  
+</body>
+</html>

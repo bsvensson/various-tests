@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>4x webmap</title>
+  <script>
+    var dojoConfig = {
+      has: {
+        "esri-native-promise": 0,
+        // "config-deferredInstrumentation": 1,
+        //"esri-feature-tiles-debug": 1
+      }
+    }
+  </script>
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+    #version, #zoom, #scale {
+      position: absolute;
+      background: #ffffff;
+      border: 1px solid grey;
+      margin: 0;
+      padding: 4px;
+    }
+    #version {
+      left: 15px;
+      top: 130px;
+    }
+    #zoom {
+      left: 15px;
+      top: 160px;
+    }
+    #scale {
+      left: 15px;
+      top: 190px;
+    }
+
+    #timeSlider {
+      position: absolute;
+      left: 100px;
+      right: 100px;
+      bottom: 20px;
+    }
+    
+    .esri-popup--is-docked-top-left .esri-popup__main-container, .esri-popup--is-docked-top-right .esri-popup__main-container, .esri-popup--is-docked-bottom-left .esri-popup__main-container, .esri-popup--is-docked-bottom-right .esri-popup__main-container {
+      max-height: 100%;
+    }    
+    .esri-popup {
+      max-height: 100%;
+    }
+    #viewDiv .esri-widget--panel { /* .esri-widget--panel for most other widgets... */
+      max-height: 100%; // 90vh;
+    }    
+  </style>
+
+  <link rel="stylesheet" href="https://jsdev.arcgis.com/next/esri/themes/light/main.css">
+  <script src="https://jsdev.arcgis.com/next/"></script>
+
+  <script>
+    require([
+      "esri/kernel",
+      "esri/config",
+      "esri/WebMap",
+      "esri/core/watchUtils",
+      "esri/views/MapView",
+      "esri/layers/GraphicsLayer",
+      "esri/geometry/Polyline",
+      "esri/Graphic",
+      "esri/geometry/Extent",
+      "esri/geometry/support/webMercatorUtils",
+      "esri/widgets/Bookmarks",
+      "esri/widgets/Expand",
+      "esri/widgets/LayerList",
+      "esri/widgets/Legend",
+      "esri/widgets/Print",
+      "esri/widgets/ScaleBar",
+      "esri/widgets/TimeSlider"
+    ], function (
+      esriNS, esriConfig, WebMap, watchUtils, MapView, GraphicsLayer, Polyline, Graphic, Extent, webMercatorUtils, 
+      Bookmarks, Expand, LayerList, Legend, Print, ScaleBar, TimeSlider
+    ) {
+      var debug = false; // for more console messages
+      
+      window.parent.postMessage("ready",'*');
+      var view, map, webmap, portal;
+      var webmapId;
+      
+      esriConfig.request.proxyUrl = "/sproxy/";  // will be used if needed
+
+      window.addEventListener("message", messageListener, false);
+      function messageListener(event) {
+        if (event.data.portal){
+          console.log(esriNS.version, "- portal:", event.data.portal);
+          esriConfig.portalUrl = event.data.portal;
+        }
+        if (event.data.webmap){
+          var webmapId = event.data.webmap;
+          loadMap(webmapId);
+          console.log(esriNS.version, "- webmap:", webmapId);
+        }
+        if (event.data.extent && view) {
+          //console.log("Changing to extent:",event.data.extent);
+          var extent = Extent.fromJSON(event.data.extent);
+          if (view.extent.xmax != extent.xmax && view.extent.xmin != extent.xmin &&
+            view.extent.ymax != extent.ymax && view.extent.ymin != extent.ymin) {
+            view.extent = extent;
+          }
+        }
+      }
+
+      function loadMap(id){
+        map = new WebMap({
+          portalItem: {
+            id: id,
+            portal: portal
+          }
+        });
+        map.when(function() {
+            if (map.widgets && map.widgets.timeSlider) {
+              //console.log(esriNS.version, "timeSlider", map.widgets.timeSlider);
+              const timeSlider = new TimeSlider({
+                container: "timeSlider",
+                view: view,
+                timeVisible: true,
+                fullTimeExtent: map.widgets.timeSlider.fullTimeExtent,
+                playRate: map.widgets.timeSlider.thumbMovingRate
+              });
+              if (map.widgets.timeSlider.stopInterval) {
+                console.log(esriNS.version, "time stops by interval:", map.widgets.timeSlider.stopInterval.value, map.widgets.timeSlider.stopInterval.unit);
+                timeSlider.stops = {interval: map.widgets.timeSlider.stopInterval}
+              } else if (map.widgets.timeSlider.numStops) {
+                console.log(esriNS.version, "time stops by count:", map.widgets.timeSlider.numStops);
+                timeSlider.stops = {count: map.widgets.timeSlider.numStops}
+              } else {
+                console.log(esriNS.version, "unknown stops....\tmap.widgets.timeSlider:", map.widgets.timeSlider);
+              }
+              view.ui.add(timeSlider, "manual");
+            }
+            console.log(esriNS.version, "webmap loaded with " + map.resourceInfo.operationalLayers.length + " operational layers.");
+            // if bookmarks, add bookmark widget
+            if (map.bookmarks && map.bookmarks.length) {
+              console.log("Bookmarks: ", map.bookmarks.length);
+              var expandBookmarks = new Expand({ 
+                view: view,
+                // expandTooltip: "Default Legend widget",
+                content: new Bookmarks({ 
+                  view: view,
+                  // container: document.createElement("div")
+                }), 
+                expanded: false,
+                group: "goodidea"
+              });
+              view.ui.add(expandBookmarks, { position: "top-right" });
+            } else {
+              debug && console.log("No bookmarks in this webmap.");
+            }
+
+          })
+          .catch(function(error) {
+            version.innerHTML += "<font color='red'><br><br><i>Hmm, we got a problem!</i><br><br>";
+            if (error.name) {
+              version.innerHTML += "<b>name:</b> " + error.name + "<br>";
+            }
+            if (error.message) {
+              version.innerHTML += "<b>message:</b> " + error.message + "<br>";
+            }
+            if (error.details) {
+              version.innerHTML += "<b>details:</b> " + JSON.stringify(error.details) + "<br>";
+            }
+          });
+        view = new MapView({
+          container: "viewDiv",
+          map: map
+        });
+        view.when(function() {
+          //4.11 bug https://devtopia.esri.com/WebGIS/arcgis-js-api/issues/19959
+          //view.when().then(() => {
+          //  view.constraints = { ...view.constraints, lods: [] };
+          //});          
+          map.layers.items.forEach(function(layer) {
+            console.log(esriNS.version, "'" + layer.type + "' layer: ", layer.title, "--", layer.id);
+            if (layer.type == "feature" && layer.source) {  // FEATURECOLLECTION
+              if (layer.url) {
+                console.log("service-based FL on the way", layer);
+              } else {
+                console.log("featurecollection FL on the way", layer);
+              }
+              if (layer.source) {
+                console.log("featurecollection FL on the way", layer);
+              } else {
+                console.log("service-based FL on the way", layer);
+              }
+              view.whenLayerView(layer).then(function(layerView) {
+                console.log("items in featurecollection", layer.source.items.length);                
+                // the storymaps FC
+                /* console.log("layer.source.items", layer.source.items);*/
+                layer.source.items.forEach(function(item) {
+                  // console.log("item", item.attributes);
+                  if (item.attributes["No_Storeys"]) {
+                    console.log("item", item.attributes["GlobalID"], "has", item.attributes["No_Storeys"]);
+                  }
+                });
+              });
+            }
+            if (layer.loadError) {
+              var error = layer.loadError;
+              if (error.name === 'layer:unknown-layer-type') {
+                version.innerHTML += "<font color='red'><br><br><i>unknown layer type</i><br><br>";
+                if (error.name) {
+                  version.innerHTML += "<b>name:</b> " + error.name + "<br>";
+                }
+                if (error.message) {
+                  version.innerHTML += "<b>message:</b> " + error.message + "<br>";
+                }
+                if (error.details) {
+                  version.innerHTML += "<b>details:</b> " + JSON.stringify(error.details) + "<br>";
+                }
+                console.log("layer", layer.loadError);
+              } else {
+                console.log("layer", layer.loadError);
+                // can happen if secure service, but cancelling sign-in ??
+              }
+            } else { // else no loadError 
+              if (layer.accessInformation) {
+                console.log("layer.accessInformation:", layer.accessInformation);
+              }
+              if (layer.portalItem) {
+                debug && console.log("layer.portalItem:", layer.portalItem);
+              }
+            }
+          }); // end map...foreach
+          if (debug) { 
+            console.log(esriNS.version, "webmap title:", map.portalItem.title);
+            console.log(esriNS.version, "webmap:", map.portalItem);
+            console.log(esriNS.version, "map.portalItem", map.portalItem);
+            console.log(esriNS.version, "map:", map);
+            console.log(esriNS.version, "map.basemap:", map.basemap);
+          }
+          if (view.spatialReference && view.spatialReference.wkid) {
+            debug && console.log(esriNS.version, "view.spatialReference.wkid:", view.spatialReference.wkid);
+          } else if (view.spatialReference && view.spatialReference.wkt) {
+            debug && console.log(esriNS.version, "view.spatialReference.wkt:", view.spatialReference.wkt);
+          } else {
+            console.log(esriNS.version, "view.spatialReference:", view.spatialReference);
+          }
+          //map.allLayers.items.forEach(function (layer) { // works everywhere
+          //map.allLayers.items.forEach(layer => {         // fails in IE11
+          //map.allLayers.forEach(layer => {                 // fails in IE11
+          map.allLayers.forEach(function (layer) { // works everywhere
+            //console.log(esriNS.version, "--------layer", layer);
+          });
+
+          var expand4 = new Expand({ 
+            view: view, 
+            expandTooltip: "webmap metadata",            
+            content: "<div style='background-color: #f3f0f0;width:400px;padding:3px;border:thin solid darkgray;border-radius:9px;'>WebMap title: "
+                  + "<a target='_blank' href='" + esriConfig.portalUrl + "/home/item.html?id=" + id + "'>"
+                  + map.portalItem.title + "</a><br>"
+                  + "Created: " + map.portalItem.created +"<br>"
+                  + "Modified: " + map.portalItem.modified +"<br>"
+                  + "Owner: " + map.portalItem.owner +"</div>",
+            expanded: true
+          });
+          view.ui.add(expand4, { position: "top-left", index: 0 });
+        });
+
+        watchUtils.whenTrue(view, "stationary", function() {
+          scale.innerHTML = "1:" + view.scale;
+          scale.style.display = "block";
+          if (typeof view.zoom) {
+            zoom.innerHTML = view.zoom;
+            zoom.style.display = "block";
+          } else {
+            console.log(esriNS.version, "No view.zoom for some reason...");
+          }
+        });
+        view.watch('stationary', function () {
+          //console.log("Changing from extent:", view.extent.toJSON());
+          window.parent.postMessage({
+            extent: view.extent.toJSON()
+          }, '*');
+        });
+        var expand1 = new Expand({ 
+          view: view,
+          expandTooltip: "Legend widget with basemaps",
+          content: new Legend({ 
+            view: view,
+            basemapLegendVisible: true, // not yet doc'd - see https://devtopia.esri.com/WebGIS/arcgis-js-sdk/issues/3709
+            container: document.createElement("div")
+          }), 
+          expanded: true,
+          group: "goodidea"
+        });
+        var expand12 = new Expand({ 
+          view: view,
+          expandTooltip: "Default Legend widget",
+          content: new Legend({ 
+            view: view,
+            container: document.createElement("div")
+          }), 
+          expanded: false,
+          group: "goodidea"
+        });
+        var expand2 = new Expand({ 
+          view: view, 
+          expandTooltip: "LayerList widget",
+          content: new LayerList({ 
+            view: view,
+            container: document.createElement("div")
+          }), 
+          expanded: false,
+          group: "goodidea"
+        });
+        var expand3 = new Expand({ 
+          view: view, 
+          expandTooltip: "Print widget",
+          content: new Print({ 
+            view: view,
+            printServiceUrl:
+              "https://utility.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task",            
+            container: document.createElement("div")
+          }), 
+          expanded: false,
+          group: "thebottomrightcorner"
+        });
+        view.ui.add(expand1, { position: "top-right" });  // expanded
+        view.ui.add(expand12, { position: "top-right" });
+        view.ui.add(expand2, { position: "top-right" });
+        view.ui.add(expand3, { position: "bottom-right" });
+        var scaleBar = new ScaleBar({ view: view, unit: "dual" });
+        view.ui.add(scaleBar, { position: "bottom-left" });
+        version.innerHTML = esriNS.version;
+      }
+    });
+  </script>
+</head>
+
+<body>
+  <div id="viewDiv">
+    <div id="timeSlider"></div>
+    <p id="version">Version 4.x</p>
+    <p id="zoom" style="display:none">Zoom level</p>
+    <p id="scale" style="display:none;font-size: smaller;color:gray">Scale</p>
+  </div>
+</body>
+
+</html>

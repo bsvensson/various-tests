@@ -1,0 +1,302 @@
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+  <title>3x webmap</title>
+
+  <link rel="stylesheet" href="https://jsdev.arcgis.com/3.36/dijit/themes/claro/claro.css">
+  <link rel="stylesheet" href="https://jsdev.arcgis.com/3.36/esri/css/esri.css">
+
+  <script>
+    // Enable WebGL on FeatureLayer for faster renderer updates and
+    // display of more features in the map
+    var dojoConfig = {
+      has: {
+        "esri-featurelayer-webgl": 1
+      }
+    }
+  </script>
+  
+  <style>
+    html,
+    body,
+    #mapDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+    }
+
+    #version{
+      position: absolute;
+      background: #ffffff;
+      border: 1px solid grey;
+      left: 60px;
+      margin: 0;
+      padding: 4px;
+      top: 20px;
+      z-index: 2;
+    }
+
+    #zoom{
+      position: absolute;
+      background: #ffffff;
+      border: 1px solid grey;
+      left: 60px;
+      margin: 0;
+      padding: 4px;
+      top: 50px;
+      z-index: 2;
+    }
+    
+    #scale{
+      position: absolute;
+      background: #ffffff;
+      border: 1px solid grey;
+      left: 60px;
+      margin: 0;
+      padding: 4px;
+      top: 80px;
+      z-index: 2;
+    }
+
+  #info{
+    background-color: whitesmoke;
+    border-bottom-left-radius: 8px;
+    border: thin solid gray;
+    height: 300px;
+    opacity: 0.9;
+    overflow-y: auto;
+    padding: 0px 0px 0px 10px;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index: 99;
+  }
+  
+  #legendDiv{
+    font-family: "Avenir Next W00","Helvetica Neue",Helvetica,Arial,sans-serif;
+    // not working // font-size: 12px !important;
+  }
+  #bookmark-container {
+    position: absolute;
+    top: 10px;
+    right: 270px;
+    padding: 1rem;
+    background: #ffffff;
+    border-radius: 4px;
+    border: 1px solid #eeeeee;
+  }
+  #layerlist-container {
+    position: absolute;
+    top: 100px;
+    left: 15px;
+    padding: 1rem;
+    background: #ffffff;
+    border-radius: 4px;
+    border: 1px solid #eeeeee;
+  }
+  #time-container {
+    position: absolute;
+    bottom: 50px;
+    left: 15px;
+    padding: 1rem;
+    background: #ffffff;
+    border-radius: 4px;
+    border: 1px solid #eeeeee;
+  }
+  </style>
+
+  <script src="https://jsdev.arcgis.com/3.36/"></script>
+  <script>
+    require([
+      "esri/kernel",
+      "esri/map",
+      "esri/arcgis/utils",
+      "esri/config",
+      "esri/TimeExtent",
+      "esri/geometry/Extent",
+      "esri/SpatialReference",
+      "esri/tasks/GeometryService",
+      "esri/dijit/Bookmarks",
+      "esri/dijit/Legend",
+      "esri/dijit/Scalebar",
+      "esri/dijit/TimeSlider",
+      "esri/dijit/LayerList"
+    ], function (
+      esriNS, Map, arcgisUtils, esriConfig, 
+      TimeExtent, Extent, SpatialReference, GeometryService, 
+      Bookmarks, Legend, Scalebar, TimeSlider, 
+      LayerList
+    ) {
+
+      var map, extent;
+      esriConfig.defaults.io.proxyUrl = "/proxy/";
+      esriConfig.defaults.geometryService = new GeometryService("https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer");
+      
+      window.parent.postMessage("ready", '*');
+      window.addEventListener("message", messageListener, false);
+
+      function messageListener(event) {
+        if (event.data.webmap) {
+          if (event.data.portal){
+            var portal = event.data.portal;
+            esriConfig.portalUrl = portal;
+            arcgisUtils.arcgisUrl = portal + "/sharing/rest/content/items"; //"https://pathto/portal/";
+            console.log(esriNS.version, "- portal:", portal);        
+          }
+          var webmapId = event.data.webmap;
+          
+          loadMap(webmapId);
+          console.log(esriNS.version, "- webmap:", webmapId);
+        }
+        if (event.data.extent && map) {
+          extent = new Extent(event.data.extent);
+          if (map.extent.xmax != extent.xmax && map.extent.xmin != extent.xmin &&
+            map.extent.ymax != extent.ymax && map.extent.ymin != extent.ymin) {
+            map.setExtent(extent);
+          }
+        }
+      }
+
+      function loadMap(id) {
+        arcgisUtils.createMap(id, "mapDiv", { usePopupManager: true }).then(function (response) {
+        //const opts = { usePopupManager: true };
+        //arcgisUtils.createMap(id, "mapDiv", opts).then(function (response) {
+        //arcgisUtils.createMap(id, "mapDiv").then(function (response) {
+          map = response.map;
+          map.on("extent-change", function (event) {
+            scale.innerHTML = "1:" + map.getScale();
+            scale.style.display = "block";
+            zoom.innerHTML = "L " + map.getZoom();
+            zoom.style.display = "block";
+
+            if (extent != event.extent) {
+              window.parent.postMessage({
+                extent: event.extent.toJson()
+              }, '*');
+            }
+          });
+          console.log(esriNS.version, "map:", map);
+          if (map.spatialReference.wkid) {
+            console.log(esriNS.version, "map.spatialReference.wkid:", map.spatialReference.wkid);
+          } else if (map.spatialReference.wkt) {
+            console.log(esriNS.version, "map.spatialReference.wkt:", map.spatialReference.wkt);
+          } else {
+            console.log(esriNS.version, "[STRANGE] map.spatialReference", map.spatialReference);
+          }
+          
+          //add the scalebar 
+          var scalebar = new Scalebar({
+            map: map,
+            scalebarUnit: "dual"
+          });
+
+          var legend = new Legend({
+            map: map
+          }, "legendDiv");
+          legend.startup();
+
+//console.log(esriNS.version, "response", response);
+//console.log(esriNS.version, "response.itemInfo (the webmap)", response.itemInfo);
+          // add timeslider widget
+          if (response.itemInfo.itemData.widgets && response.itemInfo.itemData.widgets.timeSlider) {
+            // console.log(esriNS.version, "response.itemInfo.itemData.widgets.timeSlider", response.itemInfo.itemData.widgets.timeSlider);
+            document.getElementById("time-container").hidden = false;
+            var timeSlider = new TimeSlider({
+              style: "width: 100%;"
+            }, "timeSliderDiv");
+            map.setTimeSlider(timeSlider);
+            var timeExtent = new TimeExtent();
+            var timeProps = response.itemInfo.itemData.widgets.timeSlider.properties;
+            timeExtent.startTime = new Date(timeProps.startTime);
+            timeExtent.endTime = new Date(timeProps.endTime);
+
+            //console.log(esriNS.version, "timeProps", timeProps);
+            timeSlider.setThumbCount(timeProps.thumbCount);
+            timeSlider.setThumbMovingRate(timeProps.thumbMovingRate);
+            if (timeProps.timeStopInterval) {
+              console.log(esriNS.version, "time stops by interval:", timeProps.timeStopInterval.interval, timeProps.timeStopInterval.units);
+              timeSlider.createTimeStopsByTimeInterval(timeExtent, timeProps.timeStopInterval.interval, timeProps.timeStopInterval.units);
+              document.getElementById("timetitle").innerHTML = "Stops by interval: " + timeProps.timeStopInterval.interval + " " + timeProps.timeStopInterval.units;
+            } else if (timeProps.numberOfStops) {
+              console.log(esriNS.version, "timeProps.numberOfStops", timeProps.numberOfStops);
+              timeSlider.createTimeStopsByCount(timeExtent, timeProps.numberOfStops);
+              document.getElementById("timetitle").innerHTML = timeProps.numberOfStops + " stops";
+            } else {
+              document.getElementById("timetitle").innerHTML = "Stops unknown";
+            }
+            // timeSlider.setThumbIndexes([0,1]);
+            timeSlider.startup();
+          }
+
+          // TODO - add layerlist
+          if (response.itemInfo.itemData.operationalLayers) {
+            console.log(esriNS.version, "Found operationalLayers:", response.itemInfo.itemData.operationalLayers);
+            console.log(esriNS.version, map.graphicsLayerIds);
+            console.log(esriNS.version, map.layerIds);
+            var llWidget = new LayerList({
+              map: map,
+              layers: map.graphicsLayerIds // arcgisUtils.getLayerList(response)
+            },"layerList");
+            llWidget.startup();
+          }
+          // add bookmarks widget          
+          if (response.itemInfo.itemData.bookmarks) {
+            console.log(esriNS.version, "Found bookmarks:", response.itemInfo.itemData.bookmarks);
+            var bookmarks = new Bookmarks({
+              map: map,
+              bookmarks: response.itemInfo.itemData.bookmarks
+            }, "bookmarks");
+            document.getElementById("bookmark-container").hidden = false;
+            // add a "hide" button
+            // <button class="button" id="okButton">Minimize</button>
+            // document.getElementById("okButton")
+          } else {
+            // console.log(esriNS.version, "no bookmarks");
+          }
+/*map.on("load", function (event) {
+  console.log(esriNS.version, "==== load", event);   
+});
+map.on("layer-add", function (event) {
+  console.log(esriNS.version, "==== layer-add", event);   
+});
+map.on("layer-suspend", function (event) {
+  console.log(esriNS.version, "==== layer-suspend", event);   
+});
+*/
+        }, function (error) {
+         console.log(esriNS.version, "==================== Error: ", error.code, " Message: ", error.message);
+         console.log(esriNS.version, error);         
+        });
+        version.innerHTML = esriNS.version;
+      }
+      
+    });
+  </script>
+</head>
+
+<body class="claro">
+  <p id="version">Version 3.x</p>
+  <p id="zoom" style="display:none">Zoom level</p>
+  <p id="scale" style="display:none;font-size: smaller;color:gray">Scale</p>
+  <div id="mapDiv"></div>
+  <div id="info"><div id="legendDiv"></div></div>
+  <div id="bookmark-container" hidden="true">
+    <b>Bookmarks</b>
+    <div id="bookmarks"></div>
+    <button onclick='document.getElementById("bookmarks").hidden = !document.getElementById("bookmarks").hidden;'>Show/hide bookmarks</button>
+  </div>
+  <div id="layerlist-container" hidden="true">
+    <b>layerlist</b>
+    <div id="layerlist"></div>
+    <button onclick='document.getElementById("layerlist").hidden = !document.getElementById("layerlist").hidden;'>Show/hide layerlist</button>
+  </div>
+  <div id="time-container" hidden="true">
+    <div id="timetitle">This webmap has a timeslider widget...</div>
+    <div id="timeSliderDiv"></div>
+  </div>
+
+</body>
+
+</html>
