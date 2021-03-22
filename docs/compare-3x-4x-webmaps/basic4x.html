@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>4x webmap</title>
+  <script>
+    var dojoConfig = {
+      has: {
+        // "config-deferredInstrumentation": 1,
+        //"esri-feature-tiles-debug": 1
+      }
+    }
+  </script>
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+    .esri-popup--is-docked-top-left .esri-popup__main-container, .esri-popup--is-docked-top-right .esri-popup__main-container, .esri-popup--is-docked-bottom-left .esri-popup__main-container, .esri-popup--is-docked-bottom-right .esri-popup__main-container {
+      max-height: 100%;
+    }    
+    .esri-popup {
+      max-height: 100%;
+    }
+    #viewDiv .esri-widget--panel { /* .esri-widget--panel for most other widgets... */
+      max-height: 100%; // 90vh;
+    }    
+  </style>
+
+  <link rel="stylesheet" href="https://jsdev.arcgis.com/next/esri/css/main.css">
+  <script src="https://jsdev.arcgis.com/next/"></script>
+
+  <script>
+    require([
+      "esri/kernel",
+      "esri/config",
+      "esri/WebMap",
+      "esri/core/watchUtils",
+      "esri/views/MapView",
+      "esri/layers/GraphicsLayer",
+      "esri/geometry/Polyline",
+      "esri/Graphic",
+      "esri/geometry/Extent",
+      "esri/geometry/support/webMercatorUtils"
+    ], function (
+      esriNS, esriConfig, WebMap, watchUtils, MapView, GraphicsLayer, Polyline, Graphic, Extent, webMercatorUtils
+    ) {
+      var debug = false; // for more console messages
+      
+      var appUrl = window.location.href;
+      var url = new URL(appUrl);
+
+      var view, map, webmap;
+
+      var webmapId = url.searchParams.get("webmap") || '84bf6b30a1d740fba9f19774e00f0466';
+      var portal = url.searchParams.get("portal") || 'https://www.arcgis.com';
+      if (portal == 'devext') {  // shortcuts
+        portal = 'https://devext.arcgis.com';
+      } else if (portal == 'qaext') {
+        portal = 'https://qaext.arcgis.com';
+      }
+      
+      esriConfig.request.proxyUrl = "/sproxy/";  // will be used if needed
+
+      console.log(esriNS.version, "- portal:", portal);
+      esriConfig.portalUrl = portal;
+      console.log(esriNS.version, "- webmap:", webmapId);
+
+      loadMap(webmapId);
+
+      function loadMap(id){
+        map = new WebMap({
+          portalItem: {
+            id: id,
+            portal: portal
+          }
+        });
+        map.when(function() {
+            console.log("4x webmap loaded with " + map.resourceInfo.operationalLayers.length + " operational layers.");
+            // if bookmarks, add bookmark widget
+            if (map.bookmarks && map.bookmarks.length) {
+              console.log("Bookmarks: ", map.bookmarks.length);
+            } else {
+              debug && console.log("No bookmarks in this webmap.");
+            }
+          })
+          .catch(function(error) {
+            console.log("problem loading webmap");
+            if (error.name) {
+              console.log("name: " + error.name);
+            }
+            if (error.message) {
+              console.log("message: " + error.message);
+            }
+            if (error.details) {
+              console.log("details: " + JSON.stringify(error.details));
+            }
+          });
+        view = new MapView({
+          container: "viewDiv",
+          ui:{
+              components:[]
+          },
+          map: map
+        });
+        view.when(function() {
+          //4.11 bug https://devtopia.esri.com/WebGIS/arcgis-js-api/issues/19959
+          //view.when().then(() => {
+          //  view.constraints = { ...view.constraints, lods: [] };
+          //});          
+          map.layers.items.forEach(function(layer) {
+            console.log("4x '" + layer.type + "' layer: ", layer.title, "--", layer.id);
+            if (layer.type == "feature" && layer.source) {  // FEATURECOLLECTION
+              if (layer.url) {
+                console.log("service-based FL on the way", layer);
+              } else {
+                console.log("featurecollection FL on the way", layer);
+              }
+              if (layer.source) {
+                console.log("featurecollection FL on the way", layer);
+              } else {
+                console.log("service-based FL on the way", layer);
+              }
+              view.whenLayerView(layer).then(function(layerView) {
+                console.log("items in featurecollection", layer.source.items.length);                
+                // the storymaps FC
+                /* console.log("layer.source.items", layer.source.items);*/
+                layer.source.items.forEach(function(item) {
+                  // console.log("item", item.attributes);
+                  if (item.attributes["No_Storeys"]) {
+                    console.log("item", item.attributes["GlobalID"], "has", item.attributes["No_Storeys"]);
+                  }
+                });
+              });
+            }
+            if (layer.loadError) {
+              var error = layer.loadError;
+              if (error.name === 'layer:unknown-layer-type') {
+                console.log("unknown layer type");
+                if (error.name) {
+                  console.log("name: " + error.name);
+                }
+                if (error.message) {
+                  console.log("message: " + error.message);
+                }
+                if (error.details) {
+                  console.log("details: " + JSON.stringify(error.details));
+                }
+                console.log("layer", layer.loadError);
+              } else {
+                console.log("layer", layer.loadError);
+                // can happen if secure service, but cancelling sign-in ??
+              }
+            } else { // else no loadError 
+              if (layer.accessInformation) {
+                console.log("layer.accessInformation:", layer.accessInformation);
+              }
+              if (layer.portalItem) {
+                debug && console.log("layer.portalItem:", layer.portalItem);
+              }
+            }
+          }); // end map...foreach
+          if (map.portalItem.title) {
+            console.log("WebMap title: " + map.portalItem.title + "\n"
+              + "Created: " + map.portalItem.created + "\n"
+              + "Modified: " + map.portalItem.modified + "\n"
+              + "Owner: " + map.portalItem.owner)
+          }
+
+          if (view.spatialReference && view.spatialReference.wkid) {
+            debug && console.log("4x view.spatialReference.wkid:", view.spatialReference.wkid);
+          } else if (view.spatialReference && view.spatialReference.wkt) {
+            debug && console.log("4x view.spatialReference.wkt:", view.spatialReference.wkt);
+          } else {
+            console.log("4x view.spatialReference:", view.spatialReference);
+          }
+        });
+
+        watchUtils.whenTrue(view, "stationary", function() {
+          console.log("1:" + view.scale);
+          if (typeof view.zoom) {
+            console.log("Zoom level:", view.zoom);
+          } else {
+            console.log("No view.zoom for some reason...");
+          }
+        });
+      }
+    });
+  </script>
+</head>
+
+<body>
+  <div id="viewDiv"></div>
+</body>
+
+</html>
