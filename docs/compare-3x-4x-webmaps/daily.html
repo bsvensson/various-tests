@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- IE doesn't support url.searchParams.get -->
+  <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+  <script>
+    var frame1, frame2;
+    var loaded = false;
+    var appUrl = window.location.href;
+    var url = new URL(appUrl);
+    
+    var webmapId = url.searchParams.get("webmap") || '84bf6b30a1d740fba9f19774e00f0466';
+    var portal = url.searchParams.get("portal") || 'https://www.arcgis.com';
+    var sync = url.searchParams.get("sync") || "true";
+    if (portal == 'devext') {
+      portal = 'https://devext.arcgis.com';
+    } else if (portal == 'qaext') {
+      portal = 'https://qaext.arcgis.com';
+    }
+
+    window.addEventListener("message", messageListener, false);
+
+    function messageListener(event) {
+      if (event.data == "ready") {
+        event.source.frames.frames.postMessage({
+          webmap: webmapId,
+          portal: portal
+        }, '*');
+      }
+      if (sync == "true") {
+        // syncing up the extents
+        if (event.source.frames.frames.name === "frame1" && frame2) {
+          frame2.contentWindow.postMessage(event.data, '*');
+        } else if (event.source.frames.frames.name === "frame2" && frame1) {
+          frame1.contentWindow.postMessage(event.data, '*');
+        }
+      }
+    }
+
+    function LoadPage() {
+      frame1 = document.getElementById('frame1');
+      frame2 = document.getElementById('frame2');
+    }
+  </script>
+</head>
+
+<frameset cols="50%,50%" onload="LoadPage();">
+  <frame src="webmap3x.html" name="frame1" id="frame1">
+  <frame src="webmap4x.html" name="frame2" id="frame2">
+</frameset>
+
+</html>
