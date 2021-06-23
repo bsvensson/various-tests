@@ -1,0 +1,106 @@
+
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+  <title>3x webmap</title>
+
+  <link rel="stylesheet" href="https://jsdev.arcgis.com/3.36/dijit/themes/claro/claro.css">
+  <link rel="stylesheet" href="https://jsdev.arcgis.com/3.36/esri/css/esri.css">
+
+  <script>
+    // Enable WebGL on FeatureLayer for faster renderer updates and
+    // display of more features in the map
+    var dojoConfig = {
+      has: {
+        "esri-featurelayer-webgl": 1
+      }
+    }
+  </script>
+  
+  <style>
+    html,
+    body,
+    #mapDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+    }
+  </style>
+
+  <script src="https://jsdev.arcgis.com/3.36/"></script>
+  <script>
+    require([
+      "esri/kernel",
+      "esri/map",
+      "esri/arcgis/utils",
+      "esri/config",
+      "esri/geometry/Extent",
+      "esri/SpatialReference",
+      "esri/tasks/GeometryService"
+    ], function (
+      esriNS, Map, arcgisUtils, esriConfig, 
+      Extent, SpatialReference, GeometryService
+    ) {
+
+      var appUrl = window.location.href;
+      var url = new URL(appUrl);
+
+      var webmapId = url.searchParams.get("webmap") || '84bf6b30a1d740fba9f19774e00f0466';
+      var portal = url.searchParams.get("portal") || 'https://www.arcgis.com';
+      if (portal == 'devext') {  // shortcuts
+        portal = 'https://devext.arcgis.com';
+      } else if (portal == 'qaext') {
+        portal = 'https://qaext.arcgis.com';
+      }
+
+      esriConfig.portalUrl = portal;
+      arcgisUtils.arcgisUrl = portal + "/sharing/rest/content/items"; //"https://pathto/portal/";
+      console.log(esriNS.version, "- portal:", portal);        
+
+      var map, extent;
+      esriConfig.defaults.io.proxyUrl = "/proxy/";
+      esriConfig.defaults.geometryService = new GeometryService("https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer");
+      
+      console.log(esriNS.version, "- webmap:", webmapId);
+      loadMap(webmapId);
+
+      function loadMap(id) {
+        var createMapOptions = {
+          mapOptions: {
+            logo:false,
+            showAttribution:false,
+            slider: false
+          }
+        };          
+        arcgisUtils.createMap(id, "mapDiv", { usePopupManager: true }).then(function (response) {
+        // arcgisUtils.createMap(id, "mapDiv", createMapOptions).then(function (response) {
+          map = response.map;
+          map.on("extent-change", function (event) {
+            console.log(esriNS.version, "Level", map.getZoom(), "at 1:" + map.getScale());
+
+          });
+          console.log(esriNS.version, "map:", map);
+          if (map.spatialReference.wkid) {
+            console.log(esriNS.version, "map.spatialReference.wkid:", map.spatialReference.wkid);
+          } else if (map.spatialReference.wkt) {
+            console.log(esriNS.version, "map.spatialReference.wkt:", map.spatialReference.wkt);
+          } else {
+            console.log(esriNS.version, "[STRANGE] map.spatialReference", map.spatialReference);
+          }
+        }, function (error) {
+         console.log("==================== Error: ", error.code, " Message: ", error.message);
+         console.log(error);         
+        });
+      }
+      
+    });
+  </script>
+</head>
+
+<body class="claro">
+  <div id="mapDiv"></div>
+</body>
+
+</html>
