@@ -1,0 +1,383 @@
+<html>
+<!-- Works with 4.11 and later -->
+<!-- URL parameters:
+     version
+     locale
+     webmap (or id)
+     portal
+     api
+-->
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>4x API installation check</title>
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+    #footerDiv {
+      padding: 5px;
+      z-index: 99;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: rgba(36, 36, 36, 0.8);
+      color: lightgray;
+      border-top: double;
+      text-align: center;
+      /* match the view padding */
+      height: 40px;
+    }
+
+    #footerDiv a:link {
+      color: white;
+    }
+
+    #footerDiv a:visited {
+      color: yellow;
+    }
+
+    #versionDiv,
+    #zoomDiv,
+    #scaleDiv {
+      position: absolute;
+      border: 1px solid grey;
+      margin: 0;
+      padding: 3px;
+      font-size: smaller;
+      left: 15px;
+    }
+
+    #versionDiv {
+      top: 210px;
+    }
+
+    #zoomDiv {
+      top: 240px;
+    }
+
+    #scaleDiv {
+      top: 270px;
+    }
+
+    #timeSlider {
+      position: absolute;
+      left: 100px;
+      right: 100px;
+      bottom: 20px;
+    }
+  </style>
+
+  <script>
+    let debug = false; // for more console messages
+    const href = window.location.href;
+    const pageURL = new URL(href);
+    // specify version using ?version=4.19
+    const version = pageURL.searchParams.get("version") || 'next';
+    const portal = pageURL.searchParams.get("portal") || 'https://www.arcgis.com';
+    const apiURL = pageURL.searchParams.get("api") || 'https://jsdev.arcgis.com/' + version + '/';
+    const theme = pageURL.searchParams.get("theme") || 'dark';
+    const webmapId = pageURL.searchParams.get("webmap") || pageURL.searchParams.get("id") || '2ee3425c0eb045ffa0d87bfd1e16a0aa'; //84bf6b30a1d740fba9f19774e00f0466';
+    const editbookmarks = pageURL.searchParams.get("editbookmarks") || false;
+    // aa1d3f80270146208328cf66d022e09c  -- Bookmarks
+    var csslink = document.createElement('link');
+    csslink.rel = 'stylesheet';
+    csslink.type = 'text/css';
+    csslink.href = apiURL + 'esri/themes/' + theme + '/main.css';
+    document.getElementsByTagName('HEAD')[0].appendChild(csslink);
+    var newScript = document.createElement("script");
+    newScript.src = apiURL + 'init.js';
+    newScript.onload = function() {
+      console.log("API init.js loaded from", apiURL);
+      require([
+          "esri/kernel",
+          "esri/config",
+          "esri/intl",
+          "esri/Map", "esri/WebMap",
+          "esri/core/watchUtils",
+          "esri/geometry/Extent",
+          "esri/views/MapView",
+          "esri/widgets/Bookmarks",
+          "esri/widgets/Compass", "esri/widgets/Expand",
+          "esri/widgets/Home",
+          "esri/widgets/LayerList", "esri/widgets/Legend",
+          "esri/widgets/Print",
+          "esri/widgets/ScaleBar", "esri/widgets/Search"
+        ],
+        function(esriNS, esriConfig,
+          intl,
+          Map, WebMap,
+          watchUtils,
+          Extent,
+          MapView,
+          Bookmarks,
+          Compass, Expand,
+          Home,
+          LayerList, Legend,
+          Print,
+          ScaleBar, Search
+        ) {
+          
+          window.parent.postMessage("ready",'*');
+          
+          if (pageURL.searchParams.get("locale") && esriNS.version > 4.15) {
+            const locale = pageURL.searchParams.get("locale");
+            intl.setLocale(locale);
+            console.log(esriNS.version, "-- locale:", locale);
+          }
+
+          console.log(esriNS.version, "-- webmap:", webmapId, "from", portal);
+          footerDiv.innerHTML += " <a href='about.html'>About</a> this app";
+          //footerDiv.innerHTML += " -- <a href='index.html?version=" + esriNS.version + "&webmap=" + webmapId + "'>link to this app</a>";
+          footerDiv.innerHTML += " -- <a href='" + portal + "/home/item.html?id=" + webmapId + "'>item page</a>";
+          footerDiv.innerHTML += " -- <a href='" + portal + "/sharing/rest/content/items/" + webmapId + "/data?f=pjson'>webmap JSON</a>";
+          esriConfig.portalUrl = portal;
+          map = new WebMap({
+            portalItem: {
+              id: webmapId,
+              portal: portal
+            }
+          });
+
+          map.when(function() {
+              if (map.widgets && map.widgets.timeSlider) {
+                const timeSlider = new TimeSlider({
+                  container: "timeSlider",
+                  view: view,
+                  timeVisible: true,
+                  fullTimeExtent: map.widgets.timeSlider.fullTimeExtent,
+                  playRate: map.widgets.timeSlider.thumbMovingRate
+                });
+                if (map.widgets.timeSlider.stopInterval) {
+                  console.log(esriNS.version, "time stops by interval:", map.widgets.timeSlider.stopInterval.value, map.widgets.timeSlider.stopInterval.unit);
+                  timeSlider.stops = {
+                    interval: map.widgets.timeSlider.stopInterval
+                  }
+                } else if (map.widgets.timeSlider.numStops) {
+                  console.log(esriNS.version, "time stops by count:", map.widgets.timeSlider.numStops);
+                  timeSlider.stops = {
+                    count: map.widgets.timeSlider.numStops
+                  }
+                } else {
+                  console.log(esriNS.version, "unknown stops....\tmap.widgets.timeSlider:", map.widgets.timeSlider);
+                }
+                view.ui.add(timeSlider, "manual");
+              }
+              console.log(esriNS.version, "-- webmap (version " + map.resourceInfo.version
+              + ") with " + map.resourceInfo.operationalLayers.length + " operational layers and "
+              + map.resourceInfo.baseMap.baseMapLayers.length + " basemap layers.");
+              // console.log(esriNS.version, map.resourceInfo);
+              // if bookmarks, add bookmark widget
+              if (map.bookmarks && map.bookmarks.length) {
+                console.log(esriNS.version, "-- webmap has", map.bookmarks.length, "bookmarks.");
+                addBookmarkWidgetExpanded();
+              } else {
+                if (editbookmarks) {
+                  addBookmarkWidgetExpanded();
+                }
+                debug && console.log("No bookmarks in this webmap.");
+              }
+            })
+            .catch(function(error) {
+              versionDiv.innerHTML += "<font color='red'><br><br><i>Hmm, we got a problem!</i><br><br>";
+              if (error.name) {
+                versionDiv.innerHTML += "<b>name:</b> " + error.name + "<br>";
+              }
+              if (error.message) {
+                versionDiv.innerHTML += "<b>message:</b> " + error.message + "<br>";
+              }
+              if (error.details) {
+                versionDiv.innerHTML += "<b>details:</b> " + JSON.stringify(error.details) + "<br>";
+              }
+            });
+          const view = new MapView({
+            container: "viewDiv",
+            map: map,
+            padding: {
+              bottom: 40 // Same value as the #footerDiv height in CSS,
+            }
+          });
+          view.when(function() {
+            const expandInfo = new Expand({
+              view: view,
+              expandTooltip: "webmap metadata",
+              // style='background-color: #f3f0f0;'
+              content: "<div class='esri-widget' style='width:400px;padding:3px;border:thin solid darkgray;border-radius:9px;'>WebMap title: "
+                    + "<a target='_blank' href='" + esriConfig.portalUrl + "/home/item.html?id=" + webmapId + "'>"
+                    + map.portalItem.title + "</a><br>"
+                    + "Created: " 
+                    + new Date(map.portalItem.created).toLocaleString()
+                    +"<br>"
+                    + "Last modified: " 
+                    + new Date(map.portalItem.modified).toLocaleString()
+                     +"<br>"
+                    + "Owner: " + map.portalItem.owner +"</div>",
+              expanded: true
+            });
+            view.ui.add(expandInfo, { position: "top-left", index: 0 });
+
+            watchUtils.whenTrue(view, "stationary", function() {
+              scaleDiv.innerHTML = "1:" + view.scale;
+              scaleDiv.style.display = "block";
+              if (typeof view.zoom) {
+                zoomDiv.innerHTML = "L:" + view.zoom;
+                zoomDiv.style.display = "block";
+              } else {
+                console.log(esriNS.version, "No view.zoom for some reason...");
+              }
+              
+              //console.log("Changing from extent:", view.extent.toJSON());
+              window.parent.postMessage({
+                extent: view.extent.toJSON()
+              }, '*');
+
+
+              window.addEventListener("message", messageListener, false);
+              function messageListener(event) {
+                if (event.data.extent && view) {
+                  console.log("Sync extent with other frame:",event.data.extent);
+                  var extent = Extent.fromJSON(event.data.extent);
+                  if (view.extent.xmax != extent.xmax && view.extent.xmin != extent.xmin &&
+                    view.extent.ymax != extent.ymax && view.extent.ymin != extent.ymin) {
+                    view.extent = extent;
+                  }
+                }
+              }
+            });
+            let layerCount = 0;
+            map.layers.items.forEach(function(layer) {
+              console.log(esriNS.version, '----', ++layerCount + ". '" + layer.type + "' layer: "
+              , layer.title, "--", layer.id);
+              if (layer.type == "feature" && layer.source) { // FEATURECOLLECTION
+                if (layer.url) {
+                  console.log(esriNS.version, "------ Service-based FL on the way", layer);
+                } else if (layer.source) {
+                  console.log(esriNS.version, "------ Featurecollection FL on the way?", layer);
+                } else {
+                  console.log(esriNS.version, "------ Hmm, what FL is on the way?", layer);
+                }
+                view.whenLayerView(layer).then(function(layerView) {
+                  if (layer && layer.source && layer.source.items) {
+                    console.log(esriNS.version, "------ items in featurecollection", layer.source.items.length);
+                    // the storymaps FC
+                    /* console.log("layer.source.items", layer.source.items);*/
+                    layer.source.items.forEach(function(item) {
+                      // console.log("item", item.attributes);
+                      if (item.attributes["No_Storeys"]) {
+                        console.log(esriNS.version, "item", item.attributes["GlobalID"], "has", item.attributes["No_Storeys"]);
+                      }
+                    });
+                  }
+                });
+              }
+              if (layer.loadError) {
+                var error = layer.loadError;
+                if (error.name === 'layer:unknown-layer-type') {
+                  versionDiv.innerHTML += "<font color='red'><br><br><i>unknown layer type</i><br><br>";
+                  if (error.name) {
+                    versionDiv.innerHTML += "<b>name:</b> " + error.name + "<br>";
+                  }
+                  if (error.message) {
+                    versionDiv.innerHTML += "<b>message:</b> " + error.message + "<br>";
+                  }
+                  if (error.details) {
+                    versionDiv.innerHTML += "<b>details:</b> " + JSON.stringify(error.details) + "<br>";
+                  }
+                  console.log("layer", layer.loadError);
+                } else {
+                  console.log("layer", layer.loadError);
+                  // can happen if secure service, but cancelling sign-in ??
+                }
+              } else { // else no loadError 
+                if (layer.accessInformation) {
+                  console.log("layer.accessInformation:", layer.accessInformation);
+                }
+                if (layer.portalItem) {
+                  debug && console.log("layer.portalItem:", layer.portalItem);
+                }
+              }
+            }); // end map...foreach            
+            //view.map.loadAll().then(function () {
+            const compass = new Compass({
+              view: view
+            });
+            const home = new Home({
+              view: view
+            });
+            view.ui.add([home, compass], "top-left");
+            const layerList = new LayerList({
+              view: view
+            });
+            view.ui.add(layerList, "bottom-right");
+            const searchWidget = new Search({
+              view: view
+            });
+            const expandPrint = new Expand({
+              view: view,
+              content: new Print({
+                view: view
+              }),
+              expanded: false
+            });
+            const expandLegend = new Expand({
+              view: view,
+              content: new Legend({
+                view: view
+              }),
+              expanded: false
+            });
+            view.ui.add([searchWidget, expandPrint, expandLegend], {
+              position: "top-right"
+            });
+            //});
+            const scaleBar = new ScaleBar({
+              view: view,
+              unit: "dual"
+            });
+            view.ui.add(scaleBar, {
+              position: "bottom-left"
+            });
+          }); // end view.when
+          versionDiv.innerHTML = "v" + esriNS.version;
+          versionDiv.style.display = "block";
+        });
+        function addBookmarkWidgetExpanded () {
+          const expandBookmarks = new Expand({
+            view: view,
+            // expandTooltip: "Default Legend widget",
+            content: new Bookmarks({
+              view: view,
+              editingEnabled: editbookmarks
+              // container: document.createElement("div")
+            }),
+            expanded: false,
+            group: "goodidea"
+          });
+          view.ui.add(expandBookmarks, {
+            position: "top-right"
+          });
+        }
+    }; // end newscript.onload
+    document.head.appendChild(newScript);
+  </script>
+</head>
+
+<body>
+  <div id="viewDiv">
+    <div id="timeSlider"></div>
+    <div id="versionDiv" class="esri-widget" style="display:none">v 4.x</div>
+    <div id="zoomDiv" class="esri-widget" style="display:none"></div>
+    <div id="scaleDiv" class="esri-widget" style="display:none;"></div>
+    <div id="footerDiv" class="esri-widget"></div>
+  </div>
+</body>
+
+</html>

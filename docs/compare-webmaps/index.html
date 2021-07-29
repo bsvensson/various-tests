@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+  <script>
+    let frame1, frame2;
+    let loaded = false;
+    let debug = false; // for more console messages
+    const href = window.location.href;
+    const url = new URL(href);
+    
+    const sync = url.searchParams.get("sync") || "true";
+
+    const webmapId = url.searchParams.get("webmaps") || url.searchParams.get("webmap") || '84bf6b30a1d740fba9f19774e00f0466';
+    let webmapId1, webmapId2;
+    if (webmapId.includes(',')) {
+      [webmapId1, webmapId2] = webmapId.split(',');
+    } else {
+      webmapId1 = webmapId2 = webmapId;
+    }
+
+    let portals = url.searchParams.get("portals") || url.searchParams.get("portal") || 'https://www.arcgis.com';
+    let portal1, portal2;
+    if (portals.includes(',')) {
+      [portal1, portal2] = portals.split(',');
+    } else {
+      portal1 = portal2 = portals;
+    }
+    if (portal1 == 'devext') {
+      portal1 = 'https://devext.arcgis.com';
+    } else if (portal1 == 'qaext') {
+      portal1 = 'https://qaext.arcgis.com';
+    }
+    if (portal2 == 'devext') {
+      portal2 = 'https://devext.arcgis.com';
+    } else if (portal2 == 'qaext') {
+      portal2 = 'https://qaext.arcgis.com';
+    }
+
+    const themes = url.searchParams.get("themes") || url.searchParams.get("theme") || "dark";
+    let theme1, theme2;
+    if (themes.includes(',')) {
+      [theme1,theme2] = themes.split(',');
+    } else {
+      theme1 = theme2 = themes;
+    }
+
+    let api = 'jsdev.esri.com';
+
+    // specify version using ?versions=4.19
+    let versions = url.searchParams.get("versions") || url.searchParams.get("version") || "4.20,next";
+    let version1, version2;
+    if (versions.includes(',')) {
+      [version1, version2] = versions.split(',');
+    } else {
+      version1 = version2 = versions;
+    }
+
+    // specify version using ?locale
+    let locales = url.searchParams.get("locales") || url.searchParams.get("locale") || '';
+    let locale1, locale2;
+    if (locales.includes(',')) {
+      [locale1, locale2] = locales.split(',');
+    } else {
+      locale1 = locale2 = locales;
+    }
+
+    let editbookmarks = url.searchParams.get("editbookmarks") || url.searchParams.get("editbookmark") || false;
+    let editbookmarks1, editbookmarks2;
+    if (editbookmarks.includes(',')) {
+      [editbookmarks1, editbookmarks2] = editbookmarks.split(',');
+    } else {
+      editbookmarks1 = editbookmarks2 = editbookmarks;
+    }
+
+    // turn off sync for now
+    /* window.addEventListener("message", messageListener, false);
+
+    function messageListener(event) {
+      if (event.data == "ready" ) {
+        console.log("~~~~~~~~~~~~~~~~~~~~", event.data);
+      }
+      if (sync == "true") {
+        // syncing up the extents
+        if (event.source.frames.frames.name === "frame1" && frame2) {
+          console.log("frame1 activity...")
+          frame2.contentWindow.postMessage(event.data, '*');
+        } else if (event.source.frames.frames.name === "frame2" && frame1) {
+          console.log("frame2 activity...")
+          frame1.contentWindow.postMessage(event.data, '*');
+        }
+      }
+    } */
+
+    function LoadPage() {
+      frame1 = document.getElementById('frame1');
+      frame2 = document.getElementById('frame2');
+      window.open('webmap.html?version=' + version1 + '&webmap=' + webmapId1 
+      + '&portal=' + portal1 + '&locale=' + locale1 + '&theme=' + theme1 + '&editbookmarks' + editbookmarks1,'frame1');
+      window.open('webmap.html?version=' + version2 + '&webmap=' + webmapId2 
+      + '&portal=' + portal2 + '&locale=' + locale2 + '&theme=' + theme2 + '&editbookmarks' + editbookmarks2,'frame2');
+    }
+  </script>
+</head>
+
+<frameset cols="50%,50%" onload="LoadPage();">
+  <frame src="" name="frame1" id="frame1">
+  <frame src="" name="frame2" id="frame2">
+</frameset>
+
+</html>
