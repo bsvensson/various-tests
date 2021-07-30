@@ -60,10 +60,10 @@
       const versions = url.searchParams.get("versions") || url.searchParams.get("version") || "4.20,next";
       if (versions.includes(',')) {
         const [version1, version2] = versions.split(',');
-        api1 = 'http://jsdev.arcgis.com/' + version1 + '/';
-        api2 = 'http://jsdev.arcgis.com/' + version2 + '/';
+        api1 = 'https://jsdev.arcgis.com/' + version1 + '/';
+        api2 = 'https://jsdev.arcgis.com/' + version2 + '/';
       } else {
-        api1 = api2 = 'http://jsdev.arcgis.com/' + versions + '/';
+        api1 = api2 = 'https://jsdev.arcgis.com/' + versions + '/';
       }
     }
 
