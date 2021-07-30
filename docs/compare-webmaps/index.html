@@ -12,7 +12,7 @@
     
     const sync = url.searchParams.get("sync") || "true";
 
-    const webmapId = url.searchParams.get("webmaps") || url.searchParams.get("webmap") || '84bf6b30a1d740fba9f19774e00f0466';
+    const webmapId = url.searchParams.get("webmaps") || url.searchParams.get("webmap") || '2ee3425c0eb045ffa0d87bfd1e16a0aa';
     let webmapId1, webmapId2;
     if (webmapId.includes(',')) {
       [webmapId1, webmapId2] = webmapId.split(',');
@@ -46,19 +46,29 @@
       theme1 = theme2 = themes;
     }
 
-    let api = 'jsdev.esri.com';
+    // specify version using ?versions=4.19 OR full URL using ?api=https://js.arcgis.com/next/
+    let api1, api2;
 
-    // specify version using ?versions=4.19
-    let versions = url.searchParams.get("versions") || url.searchParams.get("version") || "4.20,next";
-    let version1, version2;
-    if (versions.includes(',')) {
-      [version1, version2] = versions.split(',');
+    if (url.searchParams.has("api") ) {
+      const apis = url.searchParams.get("api")
+      if (apis.includes(',')) {
+        [api1, api2] = apis.split(',');
+      } else {
+        api1 = api2 = apis;
+      }
     } else {
-      version1 = version2 = versions;
+      const versions = url.searchParams.get("versions") || url.searchParams.get("version") || "4.20,next";
+      if (versions.includes(',')) {
+        const [version1, version2] = versions.split(',');
+        api1 = 'http://jsdev.arcgis.com/' + version1 + '/';
+        api2 = 'http://jsdev.arcgis.com/' + version2 + '/';
+      } else {
+        api1 = api2 = 'http://jsdev.arcgis.com/' + versions + '/';
+      }
     }
 
-    // specify version using ?locale
-    let locales = url.searchParams.get("locales") || url.searchParams.get("locale") || '';
+    // specify locale using ?locale
+    let locales = url.searchParams.get("locales") || url.searchParams.get("locale") || 'en';
     let locale1, locale2;
     if (locales.includes(',')) {
       [locale1, locale2] = locales.split(',');
@@ -68,7 +78,7 @@
 
     let editbookmarks = url.searchParams.get("editbookmarks") || url.searchParams.get("editbookmark") || false;
     let editbookmarks1, editbookmarks2;
-    if (editbookmarks.includes(',')) {
+    if (editbookmarks && editbookmarks.includes(',')) {
       [editbookmarks1, editbookmarks2] = editbookmarks.split(',');
     } else {
       editbookmarks1 = editbookmarks2 = editbookmarks;
@@ -96,10 +106,12 @@
     function LoadPage() {
       frame1 = document.getElementById('frame1');
       frame2 = document.getElementById('frame2');
-      window.open('webmap.html?version=' + version1 + '&webmap=' + webmapId1 
-      + '&portal=' + portal1 + '&locale=' + locale1 + '&theme=' + theme1 + '&editbookmarks' + editbookmarks1,'frame1');
-      window.open('webmap.html?version=' + version2 + '&webmap=' + webmapId2 
-      + '&portal=' + portal2 + '&locale=' + locale2 + '&theme=' + theme2 + '&editbookmarks' + editbookmarks2,'frame2');
+      window.open('webmap.html?api=' + api1 + '&webmap=' + webmapId1 
+      + '&portal=' + portal1 + '&locale=' + locale1 + '&theme=' + theme1
+      + '&editbookmarks=' + editbookmarks1,'frame1');
+      window.open('webmap.html?api=' + api2 + '&webmap=' + webmapId2 
+      + '&portal=' + portal2 + '&locale=' + locale2 + '&theme=' + theme2
+      + '&editbookmarks=' + editbookmarks2,'frame2');
     }
   </script>
 </head>

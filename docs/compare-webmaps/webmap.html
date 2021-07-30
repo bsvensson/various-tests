@@ -57,7 +57,7 @@
     }
 
     #versionDiv {
-      top: 210px;
+      top: 270px;
     }
 
     #zoomDiv {
@@ -65,7 +65,7 @@
     }
 
     #scaleDiv {
-      top: 270px;
+      top: 210px;
     }
 
     #timeSlider {
@@ -87,6 +87,7 @@
     const theme = pageURL.searchParams.get("theme") || 'dark';
     const webmapId = pageURL.searchParams.get("webmap") || pageURL.searchParams.get("id") || '2ee3425c0eb045ffa0d87bfd1e16a0aa'; //84bf6b30a1d740fba9f19774e00f0466';
     const editbookmarks = pageURL.searchParams.get("editbookmarks") || false;
+
     // aa1d3f80270146208328cf66d022e09c  -- Bookmarks
     var csslink = document.createElement('link');
     csslink.rel = 'stylesheet';
@@ -180,7 +181,8 @@
                 console.log(esriNS.version, "-- webmap has", map.bookmarks.length, "bookmarks.");
                 addBookmarkWidgetExpanded();
               } else {
-                if (editbookmarks) {
+                if (editbookmarks && editbookmarks!='false') {
+                  console.log("------------editbookmarks:", editbookmarks);
                   addBookmarkWidgetExpanded();
                 }
                 debug && console.log("No bookmarks in this webmap.");
@@ -235,10 +237,10 @@
               }
               
               //console.log("Changing from extent:", view.extent.toJSON());
+              /*
               window.parent.postMessage({
                 extent: view.extent.toJSON()
               }, '*');
-
 
               window.addEventListener("message", messageListener, false);
               function messageListener(event) {
@@ -251,6 +253,7 @@
                   }
                 }
               }
+              */
             });
             let layerCount = 0;
             map.layers.items.forEach(function(layer) {
@@ -348,15 +351,13 @@
           }); // end view.when
           versionDiv.innerHTML = "v" + esriNS.version;
           versionDiv.style.display = "block";
-        });
-        function addBookmarkWidgetExpanded () {
+
+          function addBookmarkWidgetExpanded () {
           const expandBookmarks = new Expand({
             view: view,
-            // expandTooltip: "Default Legend widget",
             content: new Bookmarks({
               view: view,
               editingEnabled: editbookmarks
-              // container: document.createElement("div")
             }),
             expanded: false,
             group: "goodidea"
@@ -365,6 +366,7 @@
             position: "top-right"
           });
         }
+      }); // end require
     }; // end newscript.onload
     document.head.appendChild(newScript);
   </script>
@@ -373,9 +375,9 @@
 <body>
   <div id="viewDiv">
     <div id="timeSlider"></div>
-    <div id="versionDiv" class="esri-widget" style="display:none">v 4.x</div>
-    <div id="zoomDiv" class="esri-widget" style="display:none"></div>
     <div id="scaleDiv" class="esri-widget" style="display:none;"></div>
+    <div id="zoomDiv" class="esri-widget" style="display:none"></div>
+    <div id="versionDiv" class="esri-widget" style="display:none">v 4.x</div>
     <div id="footerDiv" class="esri-widget"></div>
   </div>
 </body>
