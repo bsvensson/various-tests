@@ -136,10 +136,10 @@
           }
 
           console.log(esriNS.version, "-- webmap:", webmapId, "from", portal);
-          footerDiv.innerHTML += " <a href='about.html'>About</a> this app";
+          footerDiv.innerHTML += " <a href='about.html' target='_blank'>About</a> this app";
           //footerDiv.innerHTML += " -- <a href='index.html?version=" + esriNS.version + "&webmap=" + webmapId + "'>link to this app</a>";
-          footerDiv.innerHTML += " -- <a href='" + portal + "/home/item.html?id=" + webmapId + "'>item page</a>";
-          footerDiv.innerHTML += " -- <a href='" + portal + "/sharing/rest/content/items/" + webmapId + "/data?f=pjson'>webmap JSON</a>";
+          footerDiv.innerHTML += " -- <a target='_blank' href='" + portal + "/home/item.html?id=" + webmapId + "'>item page</a>";
+          footerDiv.innerHTML += " -- <a target='_blank' href='" + portal + "/sharing/rest/content/items/" + webmapId + "/data?f=pjson'>webmap JSON</a>";
           esriConfig.portalUrl = portal;
           map = new WebMap({
             portalItem: {
