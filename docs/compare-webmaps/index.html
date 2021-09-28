@@ -57,7 +57,7 @@
         api1 = api2 = apis;
       }
     } else {
-      const versions = url.searchParams.get("versions") || url.searchParams.get("version") || "4.20,next";
+      const versions = url.searchParams.get("versions") || url.searchParams.get("version") || "4.21,next";
       if (versions.includes(',')) {
         const [version1, version2] = versions.split(',');
         api1 = 'https://jsdev.arcgis.com/' + version1 + '/';
