@@ -200,15 +200,17 @@
                 console.log("service-based FL on the way", layer);
               }
               view.whenLayerView(layer).then(function(layerView) {
-                console.log("items in featurecollection", layer.source.items.length);                
-                // the storymaps FC
-                /* console.log("layer.source.items", layer.source.items);*/
-                layer.source.items.forEach(function(item) {
-                  // console.log("item", item.attributes);
-                  if (item.attributes["No_Storeys"]) {
-                    console.log("item", item.attributes["GlobalID"], "has", item.attributes["No_Storeys"]);
-                  }
-                });
+                if (layer && layer.source && layer.source.items) {
+                  console.log("items in featurecollection", layer.source.items.length);                
+                  // the storymaps FC
+                  /* console.log("layer.source.items", layer.source.items);*/
+                  layer.source.items.forEach(function(item) {
+                    // console.log("item", item.attributes);
+                    if (item.attributes["No_Storeys"]) {
+                      console.log("item", item.attributes["GlobalID"], "has", item.attributes["No_Storeys"]);
+                    }
+                  });
+                }
               });
             }
             if (layer.loadError) {
