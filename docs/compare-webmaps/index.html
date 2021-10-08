@@ -84,6 +84,8 @@
       editbookmarks1 = editbookmarks2 = editbookmarks;
     }
 
+    let show = url.searchParams.get("show") || 'layerlist,search';
+
     // turn off sync for now
     /* window.addEventListener("message", messageListener, false);
 

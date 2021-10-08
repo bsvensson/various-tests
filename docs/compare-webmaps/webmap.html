@@ -6,6 +6,7 @@
      webmap (or id)
      portal
      api
+     show (which widgets to show initially)
 -->
 
 <head>
@@ -86,6 +87,7 @@
     const apiURL = pageURL.searchParams.get("api") || 'https://jsdev.arcgis.com/' + version + '/';
     const theme = pageURL.searchParams.get("theme") || 'dark';
     const webmapId = pageURL.searchParams.get("webmap") || pageURL.searchParams.get("id") || '2ee3425c0eb045ffa0d87bfd1e16a0aa'; //84bf6b30a1d740fba9f19774e00f0466';
+    const show = pageURL.searchParams.get("show") || 'search,layerlist';
     const editbookmarks = pageURL.searchParams.get("editbookmarks") || false;
 
     // aa1d3f80270146208328cf66d022e09c  -- Bookmarks
@@ -316,31 +318,45 @@
               view: view
             });
             view.ui.add([home, compass], "top-left");
-            const layerList = new LayerList({
+
+            const expandLayerList = new Expand({
+              view: view,
+              content: new LayerList({
               view: view
+              }),
+              expanded: show.includes("layerlist")
             });
-            view.ui.add(layerList, "bottom-right");
-            const searchWidget = new Search({
+            const expandLegend = new Expand({
+              view: view,
+              content: new Legend({
               view: view
+              }),
+              expanded: show.includes("legend")
             });
             const expandPrint = new Expand({
               view: view,
               content: new Print({
                 view: view
               }),
-              expanded: false
+              expanded: show.includes("print")
             });
-            const expandLegend = new Expand({
+            const expandSearch = new Expand({
               view: view,
-              content: new Legend({
+              content: new Search({
                 view: view
               }),
-              expanded: false
+              expanded: show.includes("search")
             });
-            view.ui.add([searchWidget, expandPrint, expandLegend], {
+            view.ui.add([expandSearch, expandPrint], {
               position: "top-right"
             });
-            //});
+            view.ui.add([expandLegend], {
+              position: "bottom-right"
+            });
+            view.ui.add([expandLayerList], {
+              position: "bottom-left"
+            });
+
             const scaleBar = new ScaleBar({
               view: view,
               unit: "dual"
