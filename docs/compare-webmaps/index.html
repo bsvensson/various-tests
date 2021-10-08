@@ -9,7 +9,7 @@
     let debug = false; // for more console messages
     const href = window.location.href;
     const url = new URL(href);
-    
+
     const sync = url.searchParams.get("sync") || "true";
 
     const webmapId = url.searchParams.get("webmaps") || url.searchParams.get("webmap") || '2ee3425c0eb045ffa0d87bfd1e16a0aa';
@@ -67,7 +67,7 @@
       }
     }
 
-    // specify locale using ?locale
+    // specify locale using ?locales
     let locales = url.searchParams.get("locales") || url.searchParams.get("locale") || 'en';
     let locale1, locale2;
     if (locales.includes(',')) {
@@ -108,10 +108,10 @@
     function LoadPage() {
       frame1 = document.getElementById('frame1');
       frame2 = document.getElementById('frame2');
-      window.open('webmap.html?api=' + api1 + '&webmap=' + webmapId1 
+      window.open('webmap.html?api=' + api1 + '&webmap=' + webmapId1
       + '&portal=' + portal1 + '&locale=' + locale1 + '&theme=' + theme1
-      + '&editbookmarks=' + editbookmarks1,'frame1');
-      window.open('webmap.html?api=' + api2 + '&webmap=' + webmapId2 
+      + '&editbookmarks=' + editbookmarks1, 'frame1');
+      window.open('webmap.html?api=' + api2 + '&webmap=' + webmapId2
       + '&portal=' + portal2 + '&locale=' + locale2 + '&theme=' + theme2
       + '&editbookmarks=' + editbookmarks2,'frame2');
     }

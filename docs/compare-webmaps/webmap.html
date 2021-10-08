@@ -128,9 +128,9 @@
           Print,
           ScaleBar, Search
         ) {
-          
+
           window.parent.postMessage("ready",'*');
-          
+
           if (pageURL.searchParams.get("locale") && esriNS.version > 4.15) {
             const locale = pageURL.searchParams.get("locale");
             intl.setLocale(locale);
@@ -217,10 +217,10 @@
               content: "<div class='esri-widget' style='width:400px;padding:3px;border:thin solid darkgray;border-radius:9px;'>WebMap title: "
                     + "<a target='_blank' href='" + esriConfig.portalUrl + "/home/item.html?id=" + webmapId + "'>"
                     + map.portalItem.title + "</a><br>"
-                    + "Created: " 
+                    + "Created: "
                     + new Date(map.portalItem.created).toLocaleString()
                     +"<br>"
-                    + "Last modified: " 
+                    + "Last modified: "
                     + new Date(map.portalItem.modified).toLocaleString()
                      +"<br>"
                     + "Owner: " + map.portalItem.owner +"</div>",
@@ -237,7 +237,7 @@
               } else {
                 console.log(esriNS.version, "No view.zoom for some reason...");
               }
-              
+
               //console.log("Changing from extent:", view.extent.toJSON());
               /*
               window.parent.postMessage({
@@ -301,7 +301,7 @@
                   console.log("layer", layer.loadError);
                   // can happen if secure service, but cancelling sign-in ??
                 }
-              } else { // else no loadError 
+              } else { // else no loadError
                 if (layer.accessInformation) {
                   console.log("layer.accessInformation:", layer.accessInformation);
                 }
@@ -309,7 +309,7 @@
                   debug && console.log("layer.portalItem:", layer.portalItem);
                 }
               }
-            }); // end map...foreach            
+            }); // end map...foreach
             //view.map.loadAll().then(function () {
             const compass = new Compass({
               view: view
@@ -322,14 +322,14 @@
             const expandLayerList = new Expand({
               view: view,
               content: new LayerList({
-              view: view
+                view: view
               }),
               expanded: show.includes("layerlist")
             });
             const expandLegend = new Expand({
               view: view,
               content: new Legend({
-              view: view
+                view: view
               }),
               expanded: show.includes("legend")
             });
