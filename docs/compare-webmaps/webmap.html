@@ -152,6 +152,7 @@
             }
           });
 
+          let webmapHasTimeSlider = false;
           map.when(function() {
               if (map.widgets && map.widgets.timeSlider) {
                 const timeSlider = new TimeSlider({
@@ -175,6 +176,7 @@
                   console.log(esriNS.version, "unknown stops....\tmap.widgets.timeSlider:", map.widgets.timeSlider);
                 }
                 view.ui.add(timeSlider, "manual");
+                webmapHasTimeSlider = true;
               }
               console.log(esriNS.version, "-- webmap (version " + map.resourceInfo.version
               + ") with " + map.resourceInfo.operationalLayers.length + " operational layers and "
@@ -326,7 +328,7 @@
               content: new LayerList({
                 view: view
               }),
-              expanded: show.includes("layerlist")
+              expanded: show.includes("layerlist") && !webmapHasTimeSlider
             });
             const expandLegend = new Expand({
               view: view,
