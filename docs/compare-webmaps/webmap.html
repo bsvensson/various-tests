@@ -188,10 +188,10 @@
                 addBookmarkWidgetExpanded();
               } else {
                 if (editbookmarks && editbookmarks!='false') {
-                  console.log("------------editbookmarks:", editbookmarks);
+                  console.log(esriNS.version, "-- editbookmarks:", editbookmarks);
                   addBookmarkWidgetExpanded();
                 }
-                debug && console.log("No bookmarks in this webmap.");
+                debug && console.log(esriNS.version, "No bookmarks in this webmap.");
               }
             })
             .catch(function(error) {
@@ -242,7 +242,6 @@
                 console.log(esriNS.version, "No view.zoom for some reason...");
               }
 
-              //console.log("Changing from extent:", view.extent.toJSON());
               /*
               window.parent.postMessage({
                 extent: view.extent.toJSON()
@@ -307,10 +306,10 @@
                 }
               } else { // else no loadError
                 if (layer.accessInformation) {
-                  console.log("layer.accessInformation:", layer.accessInformation);
+                  console.log(esriNS.version, "layer.accessInformation:", layer.accessInformation);
                 }
                 if (layer.portalItem) {
-                  debug && console.log("layer.portalItem:", layer.portalItem);
+                  debug && console.log(esriNS.version, "layer.portalItem:", layer.portalItem);
                 }
               }
             }); // end map...foreach
