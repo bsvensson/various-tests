@@ -356,18 +356,18 @@
             view.ui.add([expandLegend], {
               position: "bottom-right"
             });
-            view.ui.add([expandLayerList], {
-              position: "bottom-left"
-            });
-
             const scaleBar = new ScaleBar({
               view: view,
               unit: "dual"
             });
             view.ui.add(scaleBar, {
+              position: "bottom-right"
+            });
+            view.ui.add([expandLayerList], {
               position: "bottom-left"
             });
           }); // end view.when
+
           versionDiv.innerHTML = "v" + esriNS.version;
           versionDiv.style.display = "block";
 
