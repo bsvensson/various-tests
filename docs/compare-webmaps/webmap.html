@@ -83,7 +83,7 @@
     const pageURL = new URL(href);
     // specify version using ?version=4.19
     const version = pageURL.searchParams.get("version") || 'next';
-    const portal = pageURL.searchParams.get("portal") || 'https://www.arcgis.com';
+    let portal = pageURL.searchParams.get("portal") || 'https://www.arcgis.com';
     const apiURL = pageURL.searchParams.get("api") || 'https://jsdev.arcgis.com/' + version + '/';
     const theme = pageURL.searchParams.get("theme") || 'dark';
     const webmapId = pageURL.searchParams.get("webmap") || pageURL.searchParams.get("id") || '2ee3425c0eb045ffa0d87bfd1e16a0aa'; //84bf6b30a1d740fba9f19774e00f0466';
