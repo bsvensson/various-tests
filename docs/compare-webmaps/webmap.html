@@ -90,6 +90,12 @@
     const show = pageURL.searchParams.get("show") || 'search,layerlist';
     const editbookmarks = pageURL.searchParams.get("editbookmarks") || false;
 
+    if (portal == 'devext') {
+      portal = 'https://devext.arcgis.com';
+    } else if (portal == 'qaext') {
+      portal = 'https://qaext.arcgis.com';
+    } 
+
     // aa1d3f80270146208328cf66d022e09c  -- Bookmarks
     var csslink = document.createElement('link');
     csslink.rel = 'stylesheet';
