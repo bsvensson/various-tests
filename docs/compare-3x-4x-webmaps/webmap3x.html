@@ -226,6 +226,12 @@
             } else {
               document.getElementById("timetitle").innerHTML = "Stops unknown";
             }
+            timeSlider.on("time-extent-change", displayTimeInfo);
+            function displayTimeInfo(timeExtent) {
+              document.getElementById("timedetails").innerHTML =
+                `${timeExtent.startTime.toUTCString()} --- ${timeExtent.endTime.toUTCString()}`;
+            }
+
             // timeSlider.setThumbIndexes([0,1]);
             timeSlider.startup();
           }
@@ -294,6 +300,7 @@ map.on("layer-suspend", function (event) {
   </div>
   <div id="time-container" hidden="true">
     <div id="timetitle">This webmap has a timeslider widget...</div>
+    <div id="timedetails"></div>
     <div id="timeSliderDiv"></div>
   </div>
 
