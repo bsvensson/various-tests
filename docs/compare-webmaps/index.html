@@ -76,6 +76,14 @@
       locale1 = locale2 = locales;
     }
 
+    let useapikeys = url.searchParams.get("useapikey") || 'false';
+    let useapikey1, useapikey2;
+    if (useapikeys && useapikeys.includes(',')) {
+      [useapikey1, useapikey2] = useapikey.split(',');
+    } else {
+      useapikey = useapikey2 = useapikeys;
+    }
+    
     let editbookmarks = url.searchParams.get("editbookmarks") || url.searchParams.get("editbookmark") || false;
     let editbookmarks1, editbookmarks2;
     if (editbookmarks && editbookmarks.includes(',')) {
