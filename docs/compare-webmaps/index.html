@@ -81,7 +81,7 @@
     if (useapikeys && useapikeys.includes(',')) {
       [useapikey1, useapikey2] = useapikey.split(',');
     } else {
-      useapikey = useapikey2 = useapikeys;
+      useapikey1 = useapikey2 = useapikeys;
     }
     
     let editbookmarks = url.searchParams.get("editbookmarks") || url.searchParams.get("editbookmark") || false;
