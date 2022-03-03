@@ -89,13 +89,12 @@
     const webmapId = pageURL.searchParams.get("webmap") || pageURL.searchParams.get("id") || '2ee3425c0eb045ffa0d87bfd1e16a0aa'; //84bf6b30a1d740fba9f19774e00f0466';
     const show = pageURL.searchParams.get("show") || 'search,layerlist';
     const editbookmarks = pageURL.searchParams.get("editbookmarks") || false;
-
+    const useapikey = pageURL.searchParams.get("useapikey") || false;
     if (portal == 'devext') {
       portal = 'https://devext.arcgis.com';
     } else if (portal == 'qaext') {
       portal = 'https://qaext.arcgis.com';
-    } 
-
+    }
     // aa1d3f80270146208328cf66d022e09c  -- Bookmarks
     var csslink = document.createElement('link');
     csslink.rel = 'stylesheet';
@@ -120,7 +119,7 @@
           "esri/widgets/LayerList", "esri/widgets/Legend",
           "esri/widgets/Print",
           "esri/widgets/ScaleBar", "esri/widgets/Search",
-          "esri/widgets/TimeSlider"           
+          "esri/widgets/TimeSlider"
         ],
         function(esriNS, esriConfig,
           intl,
@@ -136,15 +135,16 @@
           ScaleBar, Search,
           TimeSlider
         ) {
-
-          window.parent.postMessage("ready",'*');
-
+          window.parent.postMessage("ready", '*');
+          if (pageURL.searchParams.get("useapikey") && esriNS.version > 4.18) {
+            esriConfig.apiKey = 'AAPK39fd05cd34de46e2985f0beca37a4b50iXHRm63tF-yVnSk6F9XdUc2bY_DD_qXeS6aB2Mhj3mzOgJfybZdxRj8VHCffy73u';
+            console.log("using an API key");
+          }
           if (pageURL.searchParams.get("locale") && esriNS.version > 4.15) {
             const locale = pageURL.searchParams.get("locale");
             intl.setLocale(locale);
             console.log(esriNS.version, "-- locale:", locale);
           }
-
           console.log(esriNS.version, "-- webmap:", webmapId, "from", portal);
           footerDiv.innerHTML += " <a href='about.html' target='_blank'>About</a> this app";
           //footerDiv.innerHTML += " -- <a href='index.html?version=" + esriNS.version + "&webmap=" + webmapId + "'>link to this app</a>";
@@ -157,7 +157,6 @@
               portal: portal
             }
           });
-
           let webmapHasTimeSlider = false;
           map.when(function() {
               if (map.widgets && map.widgets.timeSlider) {
@@ -184,16 +183,16 @@
                 view.ui.add(timeSlider, "manual");
                 webmapHasTimeSlider = true;
               }
-              console.log(esriNS.version, "-- webmap (version " + map.resourceInfo.version
-              + ") with " + map.resourceInfo.operationalLayers.length + " operational layers and "
-              + map.resourceInfo.baseMap.baseMapLayers.length + " basemap layers.");
+              console.log(esriNS.version, "-- webmap (version " + map.resourceInfo.version +
+                ") with " + map.resourceInfo.operationalLayers.length + " operational layers and " +
+                map.resourceInfo.baseMap.baseMapLayers.length + " basemap layers.");
               // console.log(esriNS.version, map.resourceInfo);
               // if bookmarks, add bookmark widget
               if (map.bookmarks && map.bookmarks.length) {
                 console.log(esriNS.version, "-- webmap has", map.bookmarks.length, "bookmarks.");
                 addBookmarkWidgetExpanded();
               } else {
-                if (editbookmarks && editbookmarks!='false') {
+                if (editbookmarks && editbookmarks != 'false') {
                   console.log(esriNS.version, "-- editbookmarks:", editbookmarks);
                   addBookmarkWidgetExpanded();
                 }
@@ -224,20 +223,22 @@
               view: view,
               expandTooltip: "webmap metadata",
               // style='background-color: #f3f0f0;'
-              content: "<div class='esri-widget' style='width:400px;padding:3px;border:thin solid darkgray;border-radius:9px;'>WebMap title: "
-                    + "<a target='_blank' href='" + esriConfig.portalUrl + "/home/item.html?id=" + webmapId + "'>"
-                    + map.portalItem.title + "</a><br>"
-                    + "Created: "
-                    + new Date(map.portalItem.created).toLocaleString()
-                    +"<br>"
-                    + "Last modified: "
-                    + new Date(map.portalItem.modified).toLocaleString()
-                     +"<br>"
-                    + "Owner: " + map.portalItem.owner +"</div>",
+              content: "<div class='esri-widget' style='width:400px;padding:3px;border:thin solid darkgray;border-radius:9px;'>WebMap title: " +
+                "<a target='_blank' href='" + esriConfig.portalUrl + "/home/item.html?id=" + webmapId + "'>" +
+                map.portalItem.title + "</a><br>" +
+                "Created: " +
+                new Date(map.portalItem.created).toLocaleString() +
+                "<br>" +
+                "Last modified: " +
+                new Date(map.portalItem.modified).toLocaleString() +
+                "<br>" +
+                "Owner: " + map.portalItem.owner + "</div>",
               expanded: true
             });
-            view.ui.add(expandInfo, { position: "top-left", index: 0 });
-
+            view.ui.add(expandInfo, {
+              position: "top-left",
+              index: 0
+            });
             watchUtils.whenTrue(view, "stationary", function() {
               scaleDiv.innerHTML = "1:" + view.scale;
               scaleDiv.style.display = "block";
@@ -247,7 +248,6 @@
               } else {
                 console.log(esriNS.version, "No view.zoom for some reason...");
               }
-
               /*
               window.parent.postMessage({
                 extent: view.extent.toJSON()
@@ -268,8 +268,7 @@
             });
             let layerCount = 0;
             map.layers.items.forEach(function(layer) {
-              console.log(esriNS.version, '----', ++layerCount + ". '" + layer.type + "' layer: "
-              , layer.title, "--", layer.id);
+              console.log(esriNS.version, '----', ++layerCount + ". '" + layer.type + "' layer: ", layer.title, "--", layer.id);
               if (layer.type == "feature" && layer.source) { // FEATURECOLLECTION
                 if (layer.url) {
                   console.log(esriNS.version, "------ Service-based FL on the way", layer);
@@ -327,7 +326,6 @@
               view: view
             });
             view.ui.add([home, compass], "top-left");
-
             const expandLayerList = new Expand({
               view: view,
               content: new LayerList({
@@ -373,25 +371,24 @@
               position: "bottom-left"
             });
           }); // end view.when
-
           versionDiv.innerHTML = "v" + esriNS.version;
           versionDiv.style.display = "block";
 
-          function addBookmarkWidgetExpanded () {
-          const expandBookmarks = new Expand({
-            view: view,
-            content: new Bookmarks({
+          function addBookmarkWidgetExpanded() {
+            const expandBookmarks = new Expand({
               view: view,
-              editingEnabled: editbookmarks
-            }),
-            expanded: false,
-            group: "goodidea"
-          });
-          view.ui.add(expandBookmarks, {
-            position: "top-right"
-          });
-        }
-      }); // end require
+              content: new Bookmarks({
+                view: view,
+                editingEnabled: editbookmarks
+              }),
+              expanded: false,
+              group: "goodidea"
+            });
+            view.ui.add(expandBookmarks, {
+              position: "top-right"
+            });
+          }
+        }); // end require
     }; // end newscript.onload
     document.head.appendChild(newScript);
   </script>
