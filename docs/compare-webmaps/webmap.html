@@ -89,7 +89,7 @@
     const webmapId = pageURL.searchParams.get("webmap") || pageURL.searchParams.get("id") || '2ee3425c0eb045ffa0d87bfd1e16a0aa'; //84bf6b30a1d740fba9f19774e00f0466';
     const show = pageURL.searchParams.get("show") || 'search,layerlist';
     const editbookmarks = pageURL.searchParams.get("editbookmarks") || false;
-    const useapikey = pageURL.searchParams.get("useapikey") || false;
+    const useapikey = (pageURL.searchParams.get("useapikey") == "true") || false;
     if (portal == 'devext') {
       portal = 'https://devext.arcgis.com';
     } else if (portal == 'qaext') {
