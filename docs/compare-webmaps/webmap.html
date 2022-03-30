@@ -114,7 +114,8 @@
           "esri/geometry/Extent",
           "esri/views/MapView",
           "esri/widgets/Bookmarks",
-          "esri/widgets/Compass", "esri/widgets/Expand",
+          "esri/widgets/Compass", 
+          "esri/widgets/Editor", "esri/widgets/Expand",
           "esri/widgets/Home",
           "esri/widgets/LayerList", "esri/widgets/Legend",
           "esri/widgets/Print",
@@ -128,7 +129,8 @@
           Extent,
           MapView,
           Bookmarks,
-          Compass, Expand,
+          Compass, 
+          Editor, Expand,
           Home,
           LayerList, Legend,
           Print,
@@ -197,6 +199,9 @@
                   addBookmarkWidgetExpanded();
                 }
                 debug && console.log(esriNS.version, "No bookmarks in this webmap.");
+              }
+              if (show.includes("editor")) { 
+                addEditorWidgetExpanded();   
               }
             })
             .catch(function(error) {
@@ -318,7 +323,6 @@
                 }
               }
             }); // end map...foreach
-            //view.map.loadAll().then(function () {
             const compass = new Compass({
               view: view
             });
@@ -338,7 +342,8 @@
               content: new Legend({
                 view: view
               }),
-              expanded: show.includes("legend")
+              expanded: show.includes("legend"),
+              group: "bottomrightgroup"
             });
             const expandPrint = new Expand({
               view: view,
@@ -386,6 +391,19 @@
             });
             view.ui.add(expandBookmarks, {
               position: "top-right"
+            });
+          }
+          function addEditorWidgetExpanded(){
+            const expandEditor = new Expand({
+              view: view,
+              content: new Editor({
+                view: view
+              }),
+              expanded: true,
+              group: "bottomrightgroup"
+            });
+            view.ui.add(expandEditor, {
+              position: "bottom-right"
             });
           }
         }); // end require
