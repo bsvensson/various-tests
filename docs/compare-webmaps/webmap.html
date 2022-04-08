@@ -248,8 +248,13 @@
               scaleDiv.innerHTML = "1:" + view.scale;
               scaleDiv.style.display = "block";
               if (typeof view.zoom) {
-                zoomDiv.innerHTML = "L:" + view.zoom;
-                zoomDiv.style.display = "block";
+                if (view.zoom == "-1") {
+                  zoomDiv.innerHTML = "No LODs";
+                  zoomDiv.style.display = "block";
+                } else {
+                  zoomDiv.innerHTML = "L:" + view.zoom;
+                  zoomDiv.style.display = "block";
+                }
               } else {
                 console.log(esriNS.version, "No view.zoom for some reason...");
               }
