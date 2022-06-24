@@ -113,6 +113,7 @@
           "esri/core/watchUtils",
           "esri/geometry/Extent",
           "esri/views/MapView",
+          "esri/widgets/BasemapToggle",
           "esri/widgets/Bookmarks",
           "esri/widgets/Compass", 
           "esri/widgets/Editor", "esri/widgets/Expand",
@@ -128,6 +129,7 @@
           watchUtils,
           Extent,
           MapView,
+          BasemapToggle,
           Bookmarks,
           Compass, 
           Editor, Expand,
@@ -202,6 +204,9 @@
               }
               if (show.includes("editor")) { 
                 addEditorWidgetExpanded();   
+              }
+              if (show.includes("basemaptoggle")) { 
+                addBasemapToggleWidget();
               }
             })
             .catch(function(error) {
@@ -410,6 +415,13 @@
             view.ui.add(expandEditor, {
               position: "bottom-right"
             });
+          }
+          function addBasemapToggleWidget(){
+            const basemapToggle = new BasemapToggle({
+              view: view,
+              nextBasemap: "osm"
+            });
+            view.ui.add(basemapToggle, "bottom-right");
           }
         }); // end require
     }; // end newscript.onload
