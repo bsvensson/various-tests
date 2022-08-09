@@ -115,7 +115,7 @@
           "esri/views/MapView",
           "esri/widgets/BasemapToggle",
           "esri/widgets/Bookmarks",
-          "esri/widgets/Compass", 
+          "esri/widgets/Compass",
           "esri/widgets/Editor", "esri/widgets/Expand",
           "esri/widgets/Home",
           "esri/widgets/LayerList", "esri/widgets/Legend",
@@ -131,7 +131,7 @@
           MapView,
           BasemapToggle,
           Bookmarks,
-          Compass, 
+          Compass,
           Editor, Expand,
           Home,
           LayerList, Legend,
@@ -163,29 +163,48 @@
           });
           let webmapHasTimeSlider = false;
           map.when(function() {
-              if (map.widgets && map.widgets.timeSlider) {
-                const timeSlider = new TimeSlider({
-                  container: "timeSlider",
-                  view: view,
-                  timeVisible: true,
-                  fullTimeExtent: map.widgets.timeSlider.fullTimeExtent,
-                  playRate: map.widgets.timeSlider.thumbMovingRate
-                });
-                if (map.widgets.timeSlider.stopInterval) {
-                  console.log(esriNS.version, "time stops by interval:", map.widgets.timeSlider.stopInterval.value, map.widgets.timeSlider.stopInterval.unit);
-                  timeSlider.stops = {
-                    interval: map.widgets.timeSlider.stopInterval
+              // timestuff check
+              if (esriNS.version > 4.21) {
+                TimeSlider.getPropertiesFromWebMap(map).then((timeSliderSettings) => {
+                  if (timeSliderSettings) {
+                    console.log(esriNS.version, "-- timeslider smartness added at 4.22:", timeSliderSettings);
+                    const timeSlider = new TimeSlider({
+                      container: "timeSlider",
+                      ...timeSliderSettings,
+                      view
+                    });
+                    view.ui.add(timeSlider, "manual");
+                    webmapHasTimeSlider = true;
+                  } else {
+                    console.log(esriNS.version, "-- no timeslider properties.");
                   }
-                } else if (map.widgets.timeSlider.numStops) {
-                  console.log(esriNS.version, "time stops by count:", map.widgets.timeSlider.numStops);
-                  timeSlider.stops = {
-                    count: map.widgets.timeSlider.numStops
+                });                   
+              } else { // 4.21 and older
+                console.log(esriNS.version, "-- no timeslider smartness before 4.22, checking oldstyle");
+                if (map.widgets && map.widgets.timeSlider) {
+                  const timeSlider = new TimeSlider({
+                    container: "timeSlider",
+                    view: view,
+                    timeVisible: true,
+                    fullTimeExtent: map.widgets.timeSlider.fullTimeExtent,
+                    playRate: map.widgets.timeSlider.thumbMovingRate
+                  });
+                  if (map.widgets.timeSlider.stopInterval) {
+                    console.log(esriNS.version, "time stops by interval:", map.widgets.timeSlider.stopInterval.value, map.widgets.timeSlider.stopInterval.unit);
+                    timeSlider.stops = {
+                      interval: map.widgets.timeSlider.stopInterval
+                    }
+                  } else if (map.widgets.timeSlider.numStops) {
+                    console.log(esriNS.version, "time stops by count:", map.widgets.timeSlider.numStops);
+                    timeSlider.stops = {
+                      count: map.widgets.timeSlider.numStops
+                    }
+                  } else {
+                    console.log(esriNS.version, "unknown stops....\tmap.widgets.timeSlider:", map.widgets.timeSlider);
                   }
-                } else {
-                  console.log(esriNS.version, "unknown stops....\tmap.widgets.timeSlider:", map.widgets.timeSlider);
+                  view.ui.add(timeSlider, "manual");
+                  webmapHasTimeSlider = true;
                 }
-                view.ui.add(timeSlider, "manual");
-                webmapHasTimeSlider = true;
               }
               console.log(esriNS.version, "-- webmap (version " + map.resourceInfo.version +
                 ") with " + map.resourceInfo.operationalLayers.length + " operational layers and " +
@@ -202,10 +221,10 @@
                 }
                 debug && console.log(esriNS.version, "No bookmarks in this webmap.");
               }
-              if (show.includes("editor")) { 
-                addEditorWidgetExpanded();   
+              if (show.includes("editor")) {
+                addEditorWidgetExpanded();
               }
-              if (show.includes("basemaptoggle")) { 
+              if (show.includes("basemaptoggle")) {
                 addBasemapToggleWidget();
               }
             })
@@ -403,7 +422,8 @@
               position: "top-right"
             });
           }
-          function addEditorWidgetExpanded(){
+
+          function addEditorWidgetExpanded() {
             const expandEditor = new Expand({
               view: view,
               content: new Editor({
@@ -416,7 +436,8 @@
               position: "bottom-right"
             });
           }
-          function addBasemapToggleWidget(){
+
+          function addBasemapToggleWidget() {
             const basemapToggle = new BasemapToggle({
               view: view,
               nextBasemap: "osm"
