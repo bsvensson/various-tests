@@ -1,0 +1,130 @@
+<WMT_MS_Capabilities xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1.1">
+    <!-- original from https://api.emapsite.com/dataservicenoauth.svc/api/wms/xais?SERVICE=WMS&REQUEST=GetCapabilities-->
+    <Service>
+        <Name>OGC:WMS</Name>
+        <Title>emapsite Inside View WMS</Title>
+        <Abstract>emapsite Inside Web Map Service</Abstract>
+        <KeywordList>
+            <Keyword>WMS</Keyword>
+            <Keyword>EMAPSITE</Keyword>
+        </KeywordList>
+        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://www.emapsite.com" />
+        <ContactInformation>
+            <ContactPersonPrimary>
+                <ContactPerson>Customer Support</ContactPerson>
+                <ContactOrganization>emapsite Ltd.</ContactOrganization>
+            </ContactPersonPrimary>
+            <ContactPosition />
+            <ContactAddress>
+                <AddressType />
+                <Address>Building A2 (Office 1052), Cody Technology Park, Old Ively Road</Address>
+                <City>Farnborough</City>
+                <StateOrProvince>Hampshire</StateOrProvince>
+                <PostCode>GU14 0LX</PostCode>
+                <Country>United Kingdom</Country>
+            </ContactAddress>
+            <ContactVoiceTelephone>+44 (0)118 973 6883</ContactVoiceTelephone>
+            <ContactElectronicMailAddress>customersupport@emapsite.com</ContactElectronicMailAddress>
+        </ContactInformation>
+        <Fees>SEE_LICENCE_AGREEMENT</Fees>
+        <AccessConstraints>VALID_USER.</AccessConstraints>
+    </Service>
+    <Capability>
+        <Request>
+            <GetCapabilities>
+                <Format>application/vnd.ogc.wms_xml</Format>
+                <DCPType>
+                    <HTTP>
+                        <Get>
+                            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://api.emapsite.com/dataservicenoauth.svc/api/wms/xais" />
+                        </Get>
+                    </HTTP>
+                </DCPType>
+            </GetCapabilities>
+            <GetMap>
+                <Format>image/png</Format>
+                <Format>image/jpeg</Format>
+                <Format>image/svg</Format>
+                <Format>image/svg+xml</Format>
+                <Format>application/vnd.mapbox-vector-tile</Format>
+                <DCPType>
+                    <HTTP>
+                        <Get>
+                            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://api.emapsite.com/dataservicenoauth.svc/api/wms/xais" />
+                        </Get>
+                    </HTTP>
+                </DCPType>
+            </GetMap>
+            <GetFeatureInfo>
+                <Format>text/html</Format>
+                <Format>text/plain</Format>
+                <Format>application/vnd.ogc.gml</Format>
+                <DCPType>
+                    <HTTP>
+                        <Get>
+                            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://api.emapsite.com/dataservicenoauth.svc/api/wms/xais" />
+                        </Get>
+                    </HTTP>
+                </DCPType>
+            </GetFeatureInfo>
+        </Request>
+        <Exception>
+            <Format>application/vnd.ogc.se_xml</Format>
+            <Format>application/vnd.ogc.se_inimage</Format>
+        </Exception>
+        <Layer>
+            <Title>emapsite View WMS</Title>
+            <Abstract>emapsite View WMS</Abstract>
+            <LatLonBoundingBox minx="-7.557158946990967" miny="49.76612854003906" maxx="3.634144" maxy="61.464964" />
+            <SRS>EPSG:27700</SRS>
+            <Layer queryable="1" opaque="0">
+                <Name>OS MasterMap Topo Schema9 NoText</Name>
+                <Title>OS MasterMap Topo Schema9 NoText</Title>
+                <LatLonBoundingBox minx="-7.555903" miny="49.766129" maxx="3.634144" maxy="61.464964" />
+                <SRS>EPSG:27700</SRS>
+                <BoundingBox SRS="EPSG:27700" minx="0" miny="0" maxx="700000" maxy="1344000" />
+                <Style>
+                    <Name>default</Name><Title>The default style,
+                    which will be used if no style is explicitly requested</Title>
+                </Style>
+            </Layer>
+            <Layer queryable="1" opaque="0">
+                <Name>OS MasterMap Topo Schema9 NoText_Greyscale</Name>
+                <Title>OS MasterMap Topo Schema9 NoText - Greyscale</Title>
+                <LatLonBoundingBox minx="-7.555903" miny="49.766129" maxx="3.634144" maxy="61.464964" />
+                <SRS>EPSG:27700</SRS>
+                <BoundingBox SRS="EPSG:27700" minx="0" miny="0" maxx="700000" maxy="1344000" />
+                <Style>
+                    <Name>default</Name><Title>The default style,
+                    which will be used if no style is explicitly requested</Title>
+                </Style>
+            </Layer>
+            <Layer queryable="1" opaque="0">
+                <Name>OS MasterMap Topo Schema9 BW NoText</Name>
+                <Title>OS MasterMap Topo Schema9 BW NoText</Title>
+                <LatLonBoundingBox minx="-7.555903" miny="49.766129" maxx="3.634144" maxy="61.464964" />
+                <SRS>EPSG:27700</SRS>
+                <BoundingBox SRS="EPSG:27700" minx="0" miny="0" maxx="700000" maxy="1344000" />
+                <Style>
+                    <Name>default</Name><Title>The default style,
+                    which will be used if no style is explicitly requested</Title>
+                </Style>
+            </Layer>
+            <Layer queryable="1" opaque="0">
+                <Name>OS Zoomstack Outdoor</Name>
+                <Title>OS Zoomstack Outdoor</Title>
+                <LatLonBoundingBox minx="-7.555903" miny="49.766129" maxx="3.634144" maxy="61.464964" />
+                <SRS>EPSG:27700</SRS>
+                <BoundingBox SRS="EPSG:27700" minx="0" miny="0" maxx="700000" maxy="1344000" />
+                <SRS>EPSG:3857</SRS>
+                <BoundingBox SRS="EPSG:3857" minx="-841259" miny="6405988" maxx="404314" maxy="8733289" />
+                <SRS>EPSG:4326</SRS>
+                <BoundingBox SRS="EPSG:4326" minx="-7.557159" miny="49.76613" maxx="3.632021" maxy="61.46459" />
+                <Style>
+                    <Name>default</Name><Title>The default style,
+                    which will be used if no style is explicitly requested</Title>
+                </Style>
+            </Layer>
+        </Layer>
+    </Capability>
+</WMT_MS_Capabilities>
