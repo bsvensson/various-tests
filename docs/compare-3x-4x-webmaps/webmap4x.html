@@ -79,6 +79,7 @@
       "esri/geometry/support/webMercatorUtils",
       "esri/widgets/Bookmarks",
       "esri/widgets/Expand",
+      "esri/widgets/BasemapLayerList",
       "esri/widgets/LayerList",
       "esri/widgets/Legend",
       "esri/widgets/Print",
@@ -86,7 +87,7 @@
       "esri/widgets/TimeSlider"
     ], function (
       esriNS, esriConfig, WebMap, watchUtils, MapView, GraphicsLayer, Polyline, Graphic, Extent, webMercatorUtils, 
-      Bookmarks, Expand, LayerList, Legend, Print, ScaleBar, TimeSlider
+      Bookmarks, Expand, BasemapLayerList, LayerList, Legend, Print, ScaleBar, TimeSlider
     ) {
       var debug = false; // for more console messages
       
@@ -317,7 +318,7 @@
           expanded: false,
           group: "goodidea"
         });
-        var expand2 = new Expand({ 
+        let expand2 = new Expand({ 
           view: view, 
           expandTooltip: "LayerList widget",
           content: new LayerList({ 
@@ -327,6 +328,20 @@
           expanded: false,
           group: "goodidea"
         });
+        let expand2B = new Expand({ 
+          view: view, 
+          expandTooltip: "BasemapLayerList widget",
+          content: new BasemapLayerList({ 
+            view: view,
+            container: document.createElement("div")
+          }), 
+          expanded: false,
+          group: "goodidea"
+        });
+        if (esriNS.version >= 4.25) {
+          expand2.content.visibleElements = {errors: true};
+          expand2B.content.visibleElements = {errors: true};
+        }        
         var expand3 = new Expand({ 
           view: view, 
           expandTooltip: "Print widget",
@@ -342,6 +357,7 @@
         view.ui.add(expand1, { position: "top-right" });  // expanded
         view.ui.add(expand12, { position: "top-right" });
         view.ui.add(expand2, { position: "top-right" });
+        view.ui.add(expand2B, { position: "top-right" });
         view.ui.add(expand3, { position: "bottom-right" });
         var scaleBar = new ScaleBar({ view: view, unit: "dual" });
         view.ui.add(scaleBar, { position: "bottom-left" });
