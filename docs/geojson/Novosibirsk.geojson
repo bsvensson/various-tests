@@ -1,0 +1,60 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-ide",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2022-10-18T01:25:38Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/54",
+        "capital": "3",
+        "name": "Новосибирск",
+        "name:ar": "نوفوسيبيرسك",
+        "name:az": "Novosibirsk",
+        "name:be": "Новасібірск",
+        "name:ca": "Novossibirsk",
+        "name:cs": "Novosibirsk",
+        "name:da": "Novosibirsk",
+        "name:de": "Nowosibirsk",
+        "name:en": "Novosibirsk",
+        "name:es": "Novosibirsk",
+        "name:et": "Novosibirsk",
+        "name:fi": "Novosibirsk",
+        "name:fr": "Novossibirsk",
+        "name:he": "נובוסיבירסק",
+        "name:hi": "नोवोसिबिर्स्क",
+        "name:hr": "Novosibirsk",
+        "name:ja": "ノヴォシビルスク",
+        "name:kk": "Новосібір",
+        "name:kn": "ನೋವೋಸಿಬಿರ್ಸ್ಕ್",
+        "name:ko": "노보시비르스크",
+        "name:lt": "Novosibirskas",
+        "name:lv": "Novosibirska",
+        "name:oc": "Novosibirsk",
+        "name:pl": "Nowosybirsk",
+        "name:pt": "Novosibirsk",
+        "name:ro": "Novosibirsk",
+        "name:ru": "Новосибирск",
+        "name:sk": "Novosibirsk",
+        "name:sl": "Novosibirsk",
+        "name:uk": "Новосибірськ",
+        "name:uz": "Novosibirsk",
+        "name:zh-Hans": "新西伯利亚",
+        "name:zh-Hant": "新西伯利亞",
+        "@timestamp": "2022-09-30T16:07:11Z",
+        "@version": "29",
+        "@changeset": "126829914",
+        "@user": "GPMapper",
+        "@uid": "890496"
+      },
+      "geometry": {
+        "coordinates": [
+          82.9234509,
+          55.0282171
+        ]
+      },
+      "id": "node/54"
+    }
+  ]
+}
