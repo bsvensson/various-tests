@@ -57,13 +57,13 @@
         api1 = api2 = apis;
       }
     } else {
-      const versions = url.searchParams.get("versions") || url.searchParams.get("version") || "4.25,next";
+      const versions = url.searchParams.get("versions") || url.searchParams.get("version") || "4.26,next";
       if (versions.includes(',')) {
         const [version1, version2] = versions.split(',');
-        api1 = 'https://jsdev.arcgis.com/' + version1 + '/';
-        api2 = 'https://jsdev.arcgis.com/' + version2 + '/';
+        api1 = (version1 == 'next' ? 'https://jsdev.arcgis.com/': 'https://js.arcgis.com/') + version1 + '/';
+        api2 = (version2 == 'next' ? 'https://jsdev.arcgis.com/': 'https://js.arcgis.com/') + version2 + '/';
       } else {
-        api1 = api2 = 'https://jsdev.arcgis.com/' + versions + '/';
+        api1 = api2 = (versions == 'next' ? 'https://jsdev.arcgis.com/': 'https://js.arcgis.com/')  + versions + '/';
       }
     }
 
