@@ -110,7 +110,6 @@
           "esri/config",
           "esri/intl",
           "esri/Map", "esri/WebMap",
-          "esri/core/watchUtils",
           "esri/geometry/Extent",
           "esri/views/MapView",
           "esri/widgets/BasemapToggle",
@@ -126,7 +125,6 @@
         function(esriNS, esriConfig,
           intl,
           Map, WebMap,
-          watchUtils,
           Extent,
           MapView,
           BasemapToggle,
@@ -247,7 +245,47 @@
               bottom: 40 // Same value as the #footerDiv height in CSS,
             }
           });
+
           view.when(function() {
+            if (esriNS.version >= 4.23) {
+              require(["esri/core/reactiveUtils"], (reactiveUtils) => {
+                reactiveUtils.watch(
+                  () => view.stationary,
+                  (stationary) => {
+                    scaleDiv.innerHTML = "1:" + view.scale;
+                    scaleDiv.style.display = "block";
+                    if (typeof view.zoom) {
+                      if (view.zoom == "-1") {
+                        zoomDiv.innerHTML = "No LODs";
+                        zoomDiv.style.display = "block";
+                      } else {
+                        zoomDiv.innerHTML = "L:" + view.zoom;
+                        zoomDiv.style.display = "block";
+                      }
+                    } else {
+                      console.log(esriNS.version, "No view.zoom for some reason...");
+                    }
+                  }); // end reactiveUtils
+              });
+            } else {
+              require(["esri/core/watchUtils"], (watchUtils) => {
+                watchUtils.whenTrue(view, "stationary", function() {
+                  scaleDiv.innerHTML = "1:" + view.scale;
+                  scaleDiv.style.display = "block";
+                  if (typeof view.zoom) {
+                    if (view.zoom == "-1") {
+                      zoomDiv.innerHTML = "No LODs";
+                      zoomDiv.style.display = "block";
+                    } else {
+                      zoomDiv.innerHTML = "L:" + view.zoom;
+                      zoomDiv.style.display = "block";
+                    }
+                  } else {
+                    console.log(esriNS.version, "No view.zoom for some reason...");
+                  }
+                }); // end watchUtils       
+              });
+            }
             const expandInfo = new Expand({
               view: view,
               expandTooltip: "webmap metadata",
@@ -268,38 +306,7 @@
               position: "top-left",
               index: 0
             });
-            watchUtils.whenTrue(view, "stationary", function() {
-              scaleDiv.innerHTML = "1:" + view.scale;
-              scaleDiv.style.display = "block";
-              if (typeof view.zoom) {
-                if (view.zoom == "-1") {
-                  zoomDiv.innerHTML = "No LODs";
-                  zoomDiv.style.display = "block";
-                } else {
-                  zoomDiv.innerHTML = "L:" + view.zoom;
-                  zoomDiv.style.display = "block";
-                }
-              } else {
-                console.log(esriNS.version, "No view.zoom for some reason...");
-              }
-              /*
-              window.parent.postMessage({
-                extent: view.extent.toJSON()
-              }, '*');
 
-              window.addEventListener("message", messageListener, false);
-              function messageListener(event) {
-                if (event.data.extent && view) {
-                  console.log("Sync extent with other frame:",event.data.extent);
-                  var extent = Extent.fromJSON(event.data.extent);
-                  if (view.extent.xmax != extent.xmax && view.extent.xmin != extent.xmin &&
-                    view.extent.ymax != extent.ymax && view.extent.ymin != extent.ymin) {
-                    view.extent = extent;
-                  }
-                }
-              }
-              */
-            });
             let layerCount = 0;
             map.layers.items.forEach(function(layer) {
               console.log(esriNS.version, '----', ++layerCount + ". '" + layer.type + "' layer: ", layer.title, "--", layer.id);
