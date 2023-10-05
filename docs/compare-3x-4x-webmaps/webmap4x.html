@@ -70,7 +70,7 @@
       "esri/kernel",
       "esri/config",
       "esri/WebMap",
-      "esri/core/watchUtils",
+      "esri/core/reactiveUtils",
       "esri/views/MapView",
       "esri/layers/GraphicsLayer",
       "esri/geometry/Polyline",
@@ -86,7 +86,7 @@
       "esri/widgets/ScaleBar",
       "esri/widgets/TimeSlider"
     ], function (
-      esriNS, esriConfig, WebMap, watchUtils, MapView, GraphicsLayer, Polyline, Graphic, Extent, webMercatorUtils, 
+      esriNS, esriConfig, WebMap, reactiveUtils, MapView, GraphicsLayer, Polyline, Graphic, Extent, webMercatorUtils, 
       Bookmarks, Expand, BasemapLayerList, LayerList, Legend, Print, ScaleBar, TimeSlider
     ) {
       var debug = false; // for more console messages
@@ -276,7 +276,7 @@
           view.ui.add(expand4, { position: "top-left", index: 0 });
         });
 
-        watchUtils.whenTrue(view, "stationary", function() {
+        reactiveUtils.watch( () => view.stationary, (stationary) => {
           scale.innerHTML = "1:" + view.scale;
           scale.style.display = "block";
           if (typeof view.zoom) {
