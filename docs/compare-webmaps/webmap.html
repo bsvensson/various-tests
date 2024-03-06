@@ -117,6 +117,7 @@
           "esri/widgets/Bookmarks",
           "esri/widgets/Compass",
           "esri/widgets/Editor", "esri/widgets/Expand",
+          "esri/widgets/ElevationProfile",
           "esri/widgets/Home",
           "esri/widgets/LayerList", "esri/widgets/Legend",
           "esri/widgets/Print",
@@ -132,6 +133,7 @@
           Bookmarks,
           Compass,
           Editor, Expand,
+          ElevationProfile,
           Home,
           LayerList, Legend,
           Print,
@@ -225,6 +227,9 @@
               }
               if (show.includes("basemaptoggle")) {
                 addBasemapToggleWidget();
+              }
+              if (show.includes("elevationprofile")) {
+                addElevationProfileWidget();
               }
             })
             .catch(function(error) {
@@ -452,6 +457,16 @@
             });
             view.ui.add(basemapToggle, "bottom-right");
           }
+
+          function addElevationProfileWidget() {
+            // make sure map has "ground"
+            map.ground = "world-topobathymetry"; // or "world-elevation";
+            const elevationProfile = new ElevationProfile({
+              view: view
+            });
+            view.ui.add(elevationProfile, "bottom-right");
+          }
+
         }); // end require
     }; // end newscript.onload
     document.head.appendChild(newScript);
