@@ -179,7 +179,7 @@
                   } else {
                     console.log(esriNS.version, "-- no timeslider properties.");
                   }
-                });                   
+                });
               } else { // 4.21 and older
                 console.log(esriNS.version, "-- no timeslider smartness before 4.22, checking oldstyle");
                 if (map.widgets && map.widgets.timeSlider) {
@@ -251,7 +251,6 @@
               bottom: 40 // Same value as the #footerDiv height in CSS,
             }
           });
-
           view.when(function() {
             if (esriNS.version >= 4.23) {
               require(["esri/core/reactiveUtils"], (reactiveUtils) => {
@@ -289,7 +288,7 @@
                   } else {
                     console.log(esriNS.version, "No view.zoom for some reason...");
                   }
-                }); // end watchUtils       
+                }); // end watchUtils
               });
             }
             const expandInfo = new Expand({
@@ -312,7 +311,6 @@
               position: "top-left",
               index: 0
             });
-
             let layerCount = 0;
             map.layers.items.forEach(function(layer) {
               console.log(esriNS.version, '----', ++layerCount + ". '" + layer.type + "' layer: ", layer.title, "--", layer.id);
@@ -466,7 +464,6 @@
             });
             view.ui.add(elevationProfile, "bottom-right");
           }
-
         }); // end require
     }; // end newscript.onload
     document.head.appendChild(newScript);
