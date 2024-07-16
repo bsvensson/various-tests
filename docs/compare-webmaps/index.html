@@ -68,13 +68,18 @@
               api1 = api2 = apis;
             }
           } else {
-            const versions = url.searchParams.get("versions") || url.searchParams.get("version") || "4.28,next";
-            if (versions.includes(',')) {
+            const versions = url.searchParams.get("versions") || url.searchParams.get("version");
+            if (versions && versions.includes(',')) {
               const [version1, version2] = versions.split(',');
               api1 = (version1 == 'next' ? 'https://jsdev.arcgis.com/' : 'https://js.arcgis.com/') + version1 + '/';
               api2 = (version2 == 'next' ? 'https://jsdev.arcgis.com/' : 'https://js.arcgis.com/') + version2 + '/';
-            } else {
+            } else if (versions) {
               api1 = api2 = (versions == 'next' ? 'https://jsdev.arcgis.com/' : 'https://js.arcgis.com/') + versions + '/';
+            } else {
+              // default to latest and next versions
+              const latestversion = await npminfo("https://registry.npmjs.org/@arcgis/core");
+              api1 = 'https://js.arcgis.com/' + latestversion + '/';
+              api2 = 'https://jsdev.arcgis.com/next/';
             }
           }
           if (locales.includes(',')) {
@@ -104,6 +109,32 @@
             '&portal=' + portal2 + '&locale=' + locale2 + '&theme=' + theme2 +
             '&show=' + show + '&editbookmarks=' + editbookmarks2 + '&useapikey=' + useapikey2, 'frame2');
         } // end the big async
+
+        async function npminfo(url, comment) {
+          let latestversion;
+          await fetch(url, {
+              method: "GET"
+            })
+            .then(function(response) {
+              return response.text();
+            })
+            .then(async function(jsonresponse) {
+              let obj = JSON.parse(jsonresponse);
+              const tags = obj["dist-tags"];
+              const majorminorregex = /^(\d+)\.(\d+)/;
+              latestversion = tags["latest"].match(majorminorregex)[0];
+            })
+            .catch(function(error) {
+              console.log(
+                `fetch oops for ${url}\n${error}\n${error.message}`,
+                error,
+                "\n",
+                error.message
+              );
+            }); // end await fetch
+            return latestversion;
+          }; // end npminfo
+
       })();
     });
   </script>
