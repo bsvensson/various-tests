@@ -6,97 +6,110 @@
     let frame1, frame2;
     let loaded = false;
     let debug = false; // for more console messages
-    const href = window.location.href;
-    const url = new URL(href);
-    const sync = url.searchParams.get("sync") || "true";
-    const webmapId = url.searchParams.get("webmaps") || url.searchParams.get("webmap") || '2ee3425c0eb045ffa0d87bfd1e16a0aa';
-    let webmapId1, webmapId2;
-    if (webmapId.includes(',')) {
-      [webmapId1, webmapId2] = webmapId.split(',');
-    } else {
-      webmapId1 = webmapId2 = webmapId;
-    }
-    let portals = url.searchParams.get("portals") || url.searchParams.get("portal") || 'https://www.arcgis.com';
-    let portal1, portal2;
-    if (portals.includes(',')) {
-      [portal1, portal2] = portals.split(',');
-    } else {
-      portal1 = portal2 = portals;
-    }
-    if (portal1 == 'devext') {
-      portal1 = 'https://devext.arcgis.com';
-    } else if (portal1 == 'qaext') {
-      portal1 = 'https://qaext.arcgis.com';
-    }
-    if (portal2 == 'devext') {
-      portal2 = 'https://devext.arcgis.com';
-    } else if (portal2 == 'qaext') {
-      portal2 = 'https://qaext.arcgis.com';
-    }
-    const themes = url.searchParams.get("themes") || url.searchParams.get("theme") || "dark";
-    let theme1, theme2;
-    if (themes.includes(',')) {
-      [theme1, theme2] = themes.split(',');
-    } else {
-      theme1 = theme2 = themes;
-    }
-    // specify version using ?versions=4.19 OR full URL using ?api=https://js.arcgis.com/next/
-    let api1, api2;
-    if (url.searchParams.has("api")) {
-      const apis = url.searchParams.get("api")
-      if (apis.includes(',')) {
-        [api1, api2] = apis.split(',');
-      } else {
-        api1 = api2 = apis;
-      }
-    } else {
-      const versions = url.searchParams.get("versions") || url.searchParams.get("version") || "4.28,next";
-      if (versions.includes(',')) {
-        const [version1, version2] = versions.split(',');
-        api1 = (version1 == 'next' ? 'https://jsdev.arcgis.com/' : 'https://js.arcgis.com/') + version1 + '/';
-        api2 = (version2 == 'next' ? 'https://jsdev.arcgis.com/' : 'https://js.arcgis.com/') + version2 + '/';
-      } else {
-        api1 = api2 = (versions == 'next' ? 'https://jsdev.arcgis.com/' : 'https://js.arcgis.com/') + versions + '/';
-      }
-    }
-    // specify locale using ?locales
-    let locales = url.searchParams.get("locales") || url.searchParams.get("locale") || 'en';
-    let locale1, locale2;
-    if (locales.includes(',')) {
-      [locale1, locale2] = locales.split(',');
-    } else {
-      locale1 = locale2 = locales;
-    }
-    let useapikeys = url.searchParams.get("useapikey") || 'false';
-    let useapikey1, useapikey2;
-    if (useapikeys && useapikeys.includes(',')) {
-      [useapikey1, useapikey2] = useapikey.split(',');
-    } else {
-      useapikey1 = useapikey2 = useapikeys;
-    }
-    let editbookmarks = url.searchParams.get("editbookmarks") || url.searchParams.get("editbookmark") || false;
-    let editbookmarks1, editbookmarks2;
-    if (editbookmarks && editbookmarks.includes(',')) {
-      [editbookmarks1, editbookmarks2] = editbookmarks.split(',');
-    } else {
-      editbookmarks1 = editbookmarks2 = editbookmarks;
-    }
-    let show = url.searchParams.get("show") || 'layerlist,search';
+    window.addEventListener("load", () => {
+      (async () => {
+        // step 1. set up variables
+        const href = window.location.href;
+        const url = new URL(href);
+        const sync = url.searchParams.get("sync") || "true";
+        const webmapId = url.searchParams.get("webmaps") || url.searchParams.get("webmap") || '2ee3425c0eb045ffa0d87bfd1e16a0aa';
+        let webmapId1, webmapId2;
+        const portals = url.searchParams.get("portals") || url.searchParams.get("portal") || 'https://www.arcgis.com';
+        let portal1, portal2;
+        const themes = url.searchParams.get("themes") || url.searchParams.get("theme") || "dark";
+        let theme1, theme2;
+        // specify version using ?versions=4.19 OR full URL using ?api=https://js.arcgis.com/next/
+        let api1, api2;
+        // specify locale using ?locales
+        const locales = url.searchParams.get("locales") || url.searchParams.get("locale") || 'en';
+        let locale1, locale2;
+        const useapikeys = url.searchParams.get("useapikey") || 'false';
+        let useapikey1, useapikey2;
+        const editbookmarks = url.searchParams.get("editbookmarks") || url.searchParams.get("editbookmark") || false;
+        let editbookmarks1, editbookmarks2;
+        let show = url.searchParams.get("show") || 'layerlist,search';
+        // step 2. figure out things out
+        await setParams();
+        // step 3 - load the frames
+        loadFrames();
 
-    function LoadPage() {
-      frame1 = document.getElementById('frame1');
-      frame2 = document.getElementById('frame2');
-      window.open('webmap.html?api=' + api1 + '&webmap=' + webmapId1 +
-        '&portal=' + portal1 + '&locale=' + locale1 + '&theme=' + theme1 +
-        '&show=' + show + '&editbookmarks=' + editbookmarks1 + '&useapikey=' + useapikey1, 'frame1');
-      window.open('webmap.html?api=' + api2 + '&webmap=' + webmapId2 +
-        '&portal=' + portal2 + '&locale=' + locale2 + '&theme=' + theme2 +
-        '&show=' + show + '&editbookmarks=' + editbookmarks2 + '&useapikey=' + useapikey2, 'frame2');
-    }
+        async function setParams() {
+          if (webmapId.includes(',')) {
+            [webmapId1, webmapId2] = webmapId.split(',');
+          } else {
+            webmapId1 = webmapId2 = webmapId;
+          }
+          if (portals.includes(',')) {
+            [portal1, portal2] = portals.split(',');
+          } else {
+            portal1 = portal2 = portals;
+          }
+          if (portal1 == 'devext') {
+            portal1 = 'https://devext.arcgis.com';
+          } else if (portal1 == 'qaext') {
+            portal1 = 'https://qaext.arcgis.com';
+          }
+          if (portal2 == 'devext') {
+            portal2 = 'https://devext.arcgis.com';
+          } else if (portal2 == 'qaext') {
+            portal2 = 'https://qaext.arcgis.com';
+          }
+          if (themes.includes(',')) {
+            [theme1, theme2] = themes.split(',');
+          } else {
+            theme1 = theme2 = themes;
+          }
+          // "api/apis" takes preference over "version/versions"
+          if (url.searchParams.has("api") || url.searchParams.has("apis")) {
+            const apis = url.searchParams.get("api") || url.searchParams.get("apis");
+            if (apis.includes(',')) {
+              [api1, api2] = apis.split(',');
+            } else {
+              api1 = api2 = apis;
+            }
+          } else {
+            const versions = url.searchParams.get("versions") || url.searchParams.get("version") || "4.28,next";
+            if (versions.includes(',')) {
+              const [version1, version2] = versions.split(',');
+              api1 = (version1 == 'next' ? 'https://jsdev.arcgis.com/' : 'https://js.arcgis.com/') + version1 + '/';
+              api2 = (version2 == 'next' ? 'https://jsdev.arcgis.com/' : 'https://js.arcgis.com/') + version2 + '/';
+            } else {
+              api1 = api2 = (versions == 'next' ? 'https://jsdev.arcgis.com/' : 'https://js.arcgis.com/') + versions + '/';
+            }
+          }
+          if (locales.includes(',')) {
+            [locale1, locale2] = locales.split(',');
+          } else {
+            locale1 = locale2 = locales;
+          }
+          if (useapikeys && useapikeys.includes(',')) {
+            [useapikey1, useapikey2] = useapikey.split(',');
+          } else {
+            useapikey1 = useapikey2 = useapikeys;
+          }
+          if (editbookmarks && editbookmarks.includes(',')) {
+            [editbookmarks1, editbookmarks2] = editbookmarks.split(',');
+          } else {
+            editbookmarks1 = editbookmarks2 = editbookmarks;
+          }
+        } // setParams
+
+        function loadFrames() {
+          frame1 = document.getElementById('frame1');
+          frame2 = document.getElementById('frame2');
+          window.open('webmap.html?api=' + api1 + '&webmap=' + webmapId1 +
+            '&portal=' + portal1 + '&locale=' + locale1 + '&theme=' + theme1 +
+            '&show=' + show + '&editbookmarks=' + editbookmarks1 + '&useapikey=' + useapikey1, 'frame1');
+          window.open('webmap.html?api=' + api2 + '&webmap=' + webmapId2 +
+            '&portal=' + portal2 + '&locale=' + locale2 + '&theme=' + theme2 +
+            '&show=' + show + '&editbookmarks=' + editbookmarks2 + '&useapikey=' + useapikey2, 'frame2');
+        } // end the big async
+      })();
+    });
   </script>
 </head>
 
-<frameset cols="50%,50%" onload="LoadPage();">
+<frameset cols="50%,50%">
   <frame src="" name="frame1" id="frame1">
     <frame src="" name="frame2" id="frame2">
 </frameset>
