@@ -34,9 +34,6 @@ jobs:
           echo "I'm in `pwd`"
           ls -al
           echo -------1
-          ping fv-az1660-550
-          echo $?
-          echo -------2
           if [[ ping badmachinename ]] 
           then
             echo ok is unexpected
@@ -44,6 +41,6 @@ jobs:
             echo expected fail
           fi
           echo $?
-          echo -------3
+          echo -------2
           ping `hostname`
           echo $?
