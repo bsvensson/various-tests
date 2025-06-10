@@ -121,7 +121,8 @@
           "esri/widgets/LayerList", "esri/widgets/Legend",
           "esri/widgets/Print",
           "esri/widgets/ScaleBar", "esri/widgets/Search",
-          "esri/widgets/TimeSlider"
+          "esri/widgets/TimeSlider",
+          "esri/support/timeUtils"
         ],
         function(esriNS, esriConfig,
           intl,
@@ -136,7 +137,7 @@
           LayerList, Legend,
           Print,
           ScaleBar, Search,
-          TimeSlider
+          TimeSlider, timeUtils
         ) {
           window.parent.postMessage("ready", '*');
           if (useapikey) {
@@ -163,7 +164,22 @@
           let webmapHasTimeSlider = false;
           map.when(function() {
               // timestuff check
-              if (esriNS.version > 4.21) {
+              if (esriNS.version >= 4.32) {
+                timeUtils.getTimeSliderSettingsFromWebDocument(map).then((timeSliderSettings) => {
+                  if (timeSliderSettings) {
+                    console.log(esriNS.version, "-- timeUtils.getTimeSliderSettingsFromWebDocument() from 4.32:", timeSliderSettings);
+                    const timeSlider = new TimeSlider({
+                      container: "timeSlider",
+                      ...timeSliderSettings,
+                      view
+                    });
+                    view.ui.add(timeSlider, "manual");
+                    webmapHasTimeSlider = true;
+                  } else {
+                    console.log(esriNS.version, "-- no timeslider properties.");
+                  }
+                });
+              } else if (esriNS.version > 4.21) {
                 TimeSlider.getPropertiesFromWebMap(map).then((timeSliderSettings) => {
                   if (timeSliderSettings) {
                     console.log(esriNS.version, "-- timeslider smartness added at 4.22:", timeSliderSettings);
