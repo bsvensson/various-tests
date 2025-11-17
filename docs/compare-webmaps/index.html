@@ -77,9 +77,9 @@
               api1 = api2 = (versions == 'next' ? 'https://jsdev.arcgis.com/' : 'https://js.arcgis.com/') + versions + '/';
             } else {
               // default to latest and next versions
-              const latestversion = await npminfo("https://registry.npmjs.org/@arcgis/core");
+              const [latestversion, nextversion] = await npminfo("https://registry.npmjs.org/@arcgis/core");
               api1 = 'https://js.arcgis.com/' + latestversion + '/';
-              api2 = 'https://jsdev.arcgis.com/next/';
+              api2 = 'https://jsdev.arcgis.com/' + nextversion + '/';
             }
           }
           if (locales.includes(',')) {
@@ -112,6 +112,7 @@
 
         async function npminfo(url, comment) {
           let latestversion;
+          let nextversion;
           await fetch(url, {
               method: "GET"
             })
@@ -123,6 +124,7 @@
               const tags = obj["dist-tags"];
               const majorminorregex = /^(\d+)\.(\d+)/;
               latestversion = tags["latest"].match(majorminorregex)[0];
+              nextversion = tags["next"].match(majorminorregex)[0];
             })
             .catch(function(error) {
               console.log(
@@ -132,7 +134,7 @@
                 error.message
               );
             }); // end await fetch
-            return latestversion;
+            return [latestversion, nextversion];
           }; // end npminfo
 
       })();
