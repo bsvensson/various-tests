@@ -103,7 +103,7 @@
     csslink.href = apiURL + 'esri/themes/' + theme + '/main.css';
     document.getElementsByTagName('HEAD')[0].appendChild(csslink);
     var newScript = document.createElement("script");
-    if (/^4\./.test(version)) {
+    if ( /^4\./.test(version) || /\.com\/4\./.test(apiURL) ) {
       newScript.src = apiURL + 'init.js';
       console.log("Is version 4?", version);
     } else {
