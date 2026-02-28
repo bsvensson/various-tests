@@ -83,7 +83,7 @@
     const href = window.location.href;
     const pageURL = new URL(href);
     // specify version using ?version=4.19
-    const version = pageURL.searchParams.get("version") || 'next';
+    const version = pageURL.searchParams.get("version") || '5.0';
     let portal = pageURL.searchParams.get("portal") || 'https://www.arcgis.com';
     const apiURL = pageURL.searchParams.get("api") || 'https://jsdev.arcgis.com/' + version + '/';
     const theme = pageURL.searchParams.get("theme") || 'dark';
@@ -103,7 +103,12 @@
     csslink.href = apiURL + 'esri/themes/' + theme + '/main.css';
     document.getElementsByTagName('HEAD')[0].appendChild(csslink);
     var newScript = document.createElement("script");
-    newScript.src = apiURL + 'init.js';
+    if (/^4\./.test(version)) {
+      newScript.src = apiURL + 'init.js';
+    } else {
+      newScript.src = apiURL + 'core.js';
+      newScript.type = "module";        
+    }
     newScript.onload = function() {
       console.log("API init.js loaded from", apiURL);
       require([
