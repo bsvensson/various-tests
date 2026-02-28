@@ -105,9 +105,11 @@
     var newScript = document.createElement("script");
     if (/^4\./.test(version)) {
       newScript.src = apiURL + 'init.js';
+      console.log("Is version 4?", version);
     } else {
       newScript.src = apiURL + 'core.js';
-      newScript.type = "module";        
+      newScript.type = "module";
+      console.log("Is version 5?", version);
     }
     newScript.onload = function() {
       console.log("API init.js loaded from", apiURL);
